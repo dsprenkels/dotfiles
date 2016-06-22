@@ -1,0 +1,6 @@
+---
+- name: Set up authorized_keys
+  authorized_key:
+    user: "{{ ansible_user }}"
+    key: "{{ lookup('file', 'id_rsa.pub') }}"
+    exclusive: yes

@@ -1,0 +1,20 @@
+---
+- name: Deploy .bashrc
+  copy:
+    src: bashrc
+    dest: /home/{{ ansible_user }}/.bashrc
+    owner: "{{ ansible_user }}"
+    mode: 0755
+
+- name: Download liquidprompt
+  git:
+    repo: https://github.com/nojhan/liquidprompt.git
+    dest: "/home/{{ ansible_user }}/.liquidprompt"
+    version: v_1.10
+
+- name: Configure liquidprompt
+  copy:
+    src: liquidpromptrc
+    dest: /home/{{ ansible_user }}/.liquidpromptrc
+    owner: "{{ ansible_user }}"
+    mode: 0755

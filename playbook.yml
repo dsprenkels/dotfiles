@@ -1,0 +1,12 @@
+---
+- hosts: remotes
+  roles:
+    - authorized_keys
+
+- hosts: all
+  become: no
+  roles:
+    - personal_shell
+    - gitconfig
+    - vimrc
+    - screenrc
