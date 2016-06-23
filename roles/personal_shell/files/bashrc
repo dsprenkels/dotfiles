@@ -121,7 +121,7 @@ LC_ALL=en_US.UTF-8
 
 # start ssh-agent
 if [[ $(hostname) == "roku" ]]; then
-    eval $(keychain --eval -Q --quiet)
+    eval $(keychain --eval --quiet)
 fi
 
 # 2016-06-18 Daan  liquidprompt instellingen
