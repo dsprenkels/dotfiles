@@ -120,7 +120,7 @@ fi
 LC_ALL=en_US.UTF-8
 
 # start ssh-agent
-if [[ $(hostname) == "roku" ]]; then
+if [[ $(hostname) == roku ]]; then
     eval $(keychain --eval --quiet)
 fi
 
@@ -128,13 +128,13 @@ fi
 [[ $- = *i* ]] && source ~/.liquidprompt/liquidprompt
 
 # set gopath
-if [[ $(hostname) == "roku" ]]; then
+if [[ $(hostname) == roku ]]; then
     export GOPATH=$HOME/Documents/Code/go
     export PATH=$PATH:$GOPATH/bin
 fi
 
 # set clean path
-if [[ $(hostname) == "roku" ]]; then
+if [[ $(hostname) == roku ]]; then
     export PATH=$HOME/clean/bin:$PATH
 fi
 
@@ -142,6 +142,14 @@ fi
 export PATH=$HOME/.local/bin:$PATH
 
 # sagemath alias
-if [[ $(hostname) == "bhava" ]]; then
+if [[ $(hostname) == bhava ]]; then
     alias sagemath='docker run --rm -ti --name daan-sagemath sagemath/sagemath'
+fi
+
+if [[ $(hostname) == lilo* ]]; then
+    export MC=/vol/impuls/marcur
+    export PYTHONPATH=$MC/lilo2/lib/python2.6/site-packages
+	export PATH=$MC/lilo2/bin:$PATH
+	export MANPATH=$MC/lilo2/share/man:$MANPATH
+    alias z="exec marietje -H marietje.marie-curie.nl"
 fi
