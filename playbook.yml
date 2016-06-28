@@ -1,5 +1,11 @@
 ---
+- hosts: personal_use
+  become: no
+  roles:
+    - ansible_cfg
+
 - hosts: remotes
+  become: no
   roles:
     - authorized_keys
 
