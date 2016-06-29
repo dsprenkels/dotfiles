@@ -130,7 +130,7 @@ fi
 # set gopath
 if [[ $(hostname) == roku ]]; then
 	export GOPATH=$HOME/Documents/Code/go
-	export PATH=$PATH:$GOPATH/bin
+	export PATH=$PATH:/usr/lib/go-1.6/bin:$GOPATH/bin
 fi
 
 # set clean path
