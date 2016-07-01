@@ -2,6 +2,7 @@
 - hosts: personal_use
   become: no
   roles:
+    - face
     - ansible_cfg
 
 - hosts: remotes
