@@ -3,7 +3,7 @@
   git:
     repo: https://github.com/nojhan/liquidprompt.git
     dest: "/home/{{ ansible_user }}/.liquidprompt"
-    version: v_1.10
+    version: v_1.11
 
 - name: Configure liquidprompt
   copy:
