@@ -4,4 +4,4 @@
     src: gitconfig
     dest: /home/{{ ansible_user }}/.gitconfig
     owner: "{{ ansible_user }}"
-    mode: 0755
+    mode: 0644
