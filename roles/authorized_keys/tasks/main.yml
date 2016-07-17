@@ -2,5 +2,5 @@
 - name: Set up authorized_keys
   authorized_key:
     user: "{{ ansible_user }}"
-    key: "{{ lookup('template', 'authorized_keys.j2') }}"
+    key: "{{ lookup('template', 'default.j2') }}"
     exclusive: yes
