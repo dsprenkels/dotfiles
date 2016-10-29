@@ -1,19 +1,24 @@
 ---
-- hosts: personal_use
+- hosts: all
   become: no
   roles:
-    - face
-    - ansible_cfg
+    - gitconfig
+    - personal_shell
+    - screenrc
+    - vimrc
 
 - hosts: remotes
   become: no
   roles:
     - authorized_keys
 
-- hosts: all
+- hosts: ipython
   become: no
   roles:
-    - personal_shell
-    - gitconfig
-    - vimrc
-    - screenrc
+    - ipython_profile
+
+- hosts: personal_use
+  become: no
+  roles:
+    - face
+    - ansible_cfg
