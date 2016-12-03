@@ -108,7 +108,7 @@ if [[ $(hostname) == lilo* ]]; then
 	export PATH=$MC/lilo2/bin:$PATH
 	export MANPATH=$MC/lilo2/share/man:$MANPATH
 	alias z="exec marietje -H marietje.marie-curie.nl"
-	alias n="$MC/lilo2/bin/maruska --host http://marietje-noord.marie-curie.nl/api"
+	alias n="maruska"
 fi
 
 # set password store directory
