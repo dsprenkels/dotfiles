@@ -1,0 +1,25 @@
+---
+- name: Deploy /etc/iptables.conf
+  copy:
+    src: iptables.conf
+    dest: /etc/iptables.conf
+    owner: "root"
+    mode: 0644
+  notify:
+  - load firewall rules
+
+- name: Deploy /etc/ip6tables.conf
+  copy:
+    src: ip6tables.conf
+    dest: /etc/ip6tables.conf
+    owner: "root"
+    mode: 0644
+  notify:
+  - load firewall rules
+
+- name: Deploy /etc/network/if-up.d/00-iptables
+  copy:
+    src: 00-iptables
+    dest: /etc/network/if-up.d/00-iptables
+    owner: "root"
+    mode: 0755

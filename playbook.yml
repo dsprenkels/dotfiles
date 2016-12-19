@@ -22,3 +22,8 @@
   roles:
     - face
     - ansible_cfg
+
+- hosts: pc_firewall
+  become: yes
+  roles:
+    - pc_firewall
