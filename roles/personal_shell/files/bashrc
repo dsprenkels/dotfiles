@@ -93,9 +93,7 @@ if [[ $(hostname) == roku ]]; then
 fi
 
 # set additional local search path
-if [[ $(hostname) == roku ]]; then
-    export PATH=$HOME/.local/bin:$PATH
-fi
+export PATH=$HOME/.local/bin:$PATH
 
 # sagemath alias
 if [[ $(hostname) == roku || $(hostname) == bhava ]]; then
