@@ -86,12 +86,6 @@ if [[ $(hostname) == roku ]]; then
 	export PATH=$HOME/clean/bin:$PATH
 fi
 
-# set GHC path
-if [[ $(hostname) == roku ]]; then
-	export PATH=/opt/ghc/7.10.3/bin:$PATH
-	export PATH=/opt/cabal/1.22/bin:$PATH
-fi
-
 # set additional local search path
 export PATH=$HOME/.local/bin:$PATH
 
@@ -100,6 +94,7 @@ if [[ $(hostname) == roku || $(hostname) == bhava ]]; then
 	alias sagemath='docker run --rm -ti --name daan-sagemath sagemath/sagemath'
 fi
 
+# marietje aliases
 if [[ $(hostname) == lilo* ]]; then
 	export MC=/vol/impuls/marcur
 	export PYTHONPATH=$MC/lilo2/lib/python2.6/site-packages
@@ -112,4 +107,11 @@ fi
 # set password store directory
 if [[ $(hostname) == roku ]]; then
 	export PASSWORD_STORE_DIR=~/Documents/Porno/password-store
+fi
+
+# add pyenv to $PATH
+if [[ $(hostname) == roku ]]; then
+    export PATH="/home/daan/.pyenv/bin:$PATH"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
 fi
