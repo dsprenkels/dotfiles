@@ -115,3 +115,8 @@ if [[ $(hostname) == roku ]]; then
     eval "$(pyenv init -)"
     eval "$(pyenv virtualenv-init -)"
 fi
+
+# initialize nix environment on roku
+if [[ $(hostname) == roku ]]; then
+    source "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
