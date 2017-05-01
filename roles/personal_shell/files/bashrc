@@ -70,6 +70,7 @@ fi
 # start ssh-agent
 if [[ $(hostname) == roku ]]; then
 	eval $(keychain --eval --quiet)
+	alias keychain-add="keychain id_ed25519"
 fi
 
 # liquidprompt settings
