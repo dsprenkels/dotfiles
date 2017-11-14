@@ -95,6 +95,11 @@ if [[ $(hostname) == roku || $(hostname) == bhava ]]; then
 	alias sagemath='docker run --rm -ti --name daan-sagemath sagemath/sagemath'
 fi
 
+# sage alias for lilo
+if [[ $(hostname) == lilo* ]]; then
+	alias sage=/scratch/dsprenkels/SageMath/sage
+fi
+
 # marietje aliases
 if [[ $(hostname) == lilo* ]]; then
 	export MC=/vol/impuls/marcur
@@ -125,4 +130,10 @@ fi
 # add an alias for initializing a netsec correction session
 if [[ $(hostname) == roku ]]; then
     alias netsec-correction="wget -q --output-document=/tmp/ta-helpers.sh -- https://gist.githubusercontent.com/dsprenkels/d512dae9f7a4d97bf0d1847918ce17c9/raw/1e66b494b5eceaed66283cea1abc042e0534e12e/ta-helpers.sh && source /tmp/ta-helpers.sh"
+fi
+
+# add roku morning routine alias
+# TODO(dsprenkels) Just fix the auto-startup of these things
+if [[ $(hostname) == roku ]]; then
+    alias ssh-start-session="killall ssh-agent; keychain-add; exec bash"
 fi
