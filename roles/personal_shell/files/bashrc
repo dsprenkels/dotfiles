@@ -90,16 +90,6 @@ fi
 # set additional local search path
 export PATH=$HOME/.local/bin:$PATH
 
-# sagemath alias
-if [[ $(hostname) == roku || $(hostname) == bhava ]]; then
-	alias sagemath='docker run --rm -ti --name daan-sagemath sagemath/sagemath'
-fi
-
-# sage alias for lilo
-if [[ $(hostname) == lilo* ]]; then
-	alias sage=/scratch/dsprenkels/SageMath/sage
-fi
-
 # marietje aliases
 if [[ $(hostname) == lilo* ]]; then
 	export MC=/vol/impuls/marcur
