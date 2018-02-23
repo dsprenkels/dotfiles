@@ -1,90 +1,25 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
-
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
-# enable bash completion in interactive shells
-if [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-fi
-
-# If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
-
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
-shopt -s histappend
-
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=100000
 HISTFILESIZE=200000
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
-
-# make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
 # enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    alias dir='dir --color=auto'
-    alias vdir='vdir --color=auto'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
-
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
-fi
-
-# start ssh-agent
-if [[ $(hostname) == roku ]]; then
-	eval $(keychain --eval --quiet)
-	alias keychain-add="keychain id_ed25519"
-fi
+alias ls='ls --color=auto'
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
 
 # liquidprompt settings
 [[ $- = *i* ]] && source ~/.liquidprompt/liquidprompt
 
 # set gopath
-if [[ $(hostname) == roku ]]; then
+if [[ $(hostname) == aang ]]; then
 	export GOPATH=$HOME/Documents/Code/go
 	export PATH=$PATH:/usr/lib/go-1.6/bin:$GOPATH/bin
-fi
-
-# set clean path
-if [[ $(hostname) == roku ]]; then
-	export PATH=$HOME/clean/bin:$PATH
 fi
 
 # set additional local search path
@@ -101,29 +36,11 @@ if [[ $(hostname) == lilo* ]]; then
 fi
 
 # set password store directory
-if [[ $(hostname) == roku ]]; then
+if [[ $(hostname) == aang ]]; then
 	export PASSWORD_STORE_DIR=~/Documents/Porno/password-store
 fi
 
-# add pyenv to $PATH
-if [[ $(hostname) == roku ]]; then
-    export PATH="/home/daan/.pyenv/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
-fi
-
-# initialize nix environment on roku
-if [[ $(hostname) == roku ]]; then
-    source "$HOME/.nix-profile/etc/profile.d/nix.sh"
-fi
-
 # add an alias for initializing a netsec correction session
-if [[ $(hostname) == roku ]]; then
+if [[ $(hostname) == aang ]]; then
     alias netsec-correction="wget -q --output-document=/tmp/ta-helpers.sh -- https://gist.githubusercontent.com/dsprenkels/d512dae9f7a4d97bf0d1847918ce17c9/raw/1e66b494b5eceaed66283cea1abc042e0534e12e/ta-helpers.sh && source /tmp/ta-helpers.sh"
-fi
-
-# add roku morning routine alias
-# TODO(dsprenkels) Just fix the auto-startup of these things
-if [[ $(hostname) == roku ]]; then
-    alias ssh-start-session="killall ssh-agent; keychain-add; exec bash"
 fi
