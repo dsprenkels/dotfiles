@@ -37,7 +37,7 @@ fi
 
 # set password store directory
 if [[ $(hostname) == aang ]]; then
-	export PASSWORD_STORE_DIR=~/Documents/Porno/password-store
+	export PASSWORD_STORE_DIR=~/Documents/Vault/password-store
 fi
 
 # add an alias for initializing a netsec correction session
