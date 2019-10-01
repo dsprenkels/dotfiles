@@ -47,5 +47,5 @@ fi
 
 # add an alias for starting factorio
 if [[ $(hostname) == aang ]]; then
-	alias factorio="firejail $HOME/factorio/bin/x64/factorio"
+	alias factorio="firejail $HOME/Games/Factorio/bin/x64/factorio"
 fi
