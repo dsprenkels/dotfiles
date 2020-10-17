@@ -10,7 +10,7 @@ then
     exit 2
 fi
 
-if [ "${HOST}" = "aang" ]; then
+if [ "${HOST}" = "local" ]; then
     rm --verbose -rf "$HOME/.liquidprompt"
     cp --verbose -r "$AUTORCDIR/." "$HOME"
 else
