@@ -20,11 +20,9 @@ then
 fi
 
 if [ "${HOST}" = "local" ]; then
-    rm --verbose -f "$HOME/deploy_all.sh"
     rm --verbose -rf "$HOME/.liquidprompt"
     cp --verbose -r "$AUTORCDIR/." "$HOME"
 else
-    ssh "$HOST" -- rm --verbose -f "\$HOME/deploy_all.sh"
     ssh "$HOST" -- rm --verbose -rf "\$HOME/.liquidprompt"
     rsync -ravuh "$AUTORCDIR/." "$HOST:"
 fi
