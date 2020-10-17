@@ -1,7 +1,0 @@
----
-- name: Deploy profile picture
-  copy:
-    src: face
-    dest: /home/{{ ansible_user }}/.face
-    owner: "{{ ansible_user }}"
-    mode: 0644

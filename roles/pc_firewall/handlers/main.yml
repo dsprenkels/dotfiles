@@ -1,3 +1,0 @@
----
-- name: load firewall rules
-  shell: iptables-restore </etc/firewall.conf

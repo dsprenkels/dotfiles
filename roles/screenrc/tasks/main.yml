@@ -1,7 +1,0 @@
----
-- name: Deploy .screenrc
-  copy:
-    src: screenrc
-    dest: /home/{{ ansible_user }}/.screenrc
-    owner: "{{ ansible_user }}"
-    mode: 0644

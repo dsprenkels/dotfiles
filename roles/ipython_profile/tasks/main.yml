@@ -1,8 +1,0 @@
----
-- name: Copy logging startup script for ipython
-  copy:
-    src: 90-logging.py
-    dest: "/home/{{ ansible_user }}/.ipython/profile_default/startup/90-logging.py"
-    owner: "{{ ansible_user }}"
-    mode: 0755
-  ignore_errors: yes
