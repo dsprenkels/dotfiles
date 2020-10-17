@@ -1,6 +1,10 @@
+#!/bin/sh
+
 ####################################
 # LIQUID PROMPT CONFIGURATION FILE #
 ####################################
+
+# shellcheck disable=SC2034
 
 # If you want to use different themes and features,
 # you can load the corresponding files here:

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -14,6 +16,8 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # liquidprompt settings
+# shellcheck source=.liquidprompt/liquidprompt
+# shellcheck disable=SC1091
 [[ $- = *i* ]] && source ~/.liquidprompt/liquidprompt
 
 # set gopath
@@ -34,5 +38,5 @@ fi
 
 # add an alias for starting factorio
 if [[ $(hostname) == aang ]]; then
-	alias factorio="firejail $HOME/Games/Factorio/bin/x64/factorio"
+	alias factorio="firejail \$HOME/Games/Factorio/bin/x64/factorio"
 fi
