@@ -10,10 +10,21 @@ then
     exit 2
 fi
 
+if [ "${1+x}" != "--force" ] && [ "$(git status --porcelain=v1 2>/dev/null | grep -vc '_drafts/')" -ne 0 ]
+then
+    git status
+    echo
+    echo >&2 "There are unstaged changes! Refusing to deploy."
+    echo >&2 "Please stash or discard the changes and try again."
+    exit 1
+fi
+
 if [ "${HOST}" = "local" ]; then
+    rm --verbose -f "$HOME/deploy_all.sh"
     rm --verbose -rf "$HOME/.liquidprompt"
     cp --verbose -r "$AUTORCDIR/." "$HOME"
 else
+    ssh "$HOST" -- rm --verbose -f "\$HOME/deploy_all.sh"
     ssh "$HOST" -- rm --verbose -rf "\$HOME/.liquidprompt"
     rsync -ravuh "$AUTORCDIR/." "$HOST:"
 fi
