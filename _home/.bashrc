@@ -41,3 +41,10 @@ fi
 if [[ $(hostname) == aang ]]; then
 	alias factorio="firejail \$HOME/Games/Factorio/bin/x64/factorio"
 fi
+
+# use keychain if we're on aang and we are logged in via SSH
+if [[ $(hostname) == aang ]]; then
+	if [ -n "$SSH_TTY" ]; then
+		eval "$(keychain --eval --quiet)"
+	fi
+fi
