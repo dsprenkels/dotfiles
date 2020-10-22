@@ -6,6 +6,7 @@
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=100000
 HISTFILESIZE=200000
+HISTCONTROL=ignorespace
 
 # enable color support of ls and also add handy aliases
 alias ls='ls --color=auto'
