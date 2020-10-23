@@ -44,7 +44,7 @@ fi
 
 # use keychain if we're on aang and we are logged in via SSH
 if [[ $(hostname) == aang ]]; then
-	if [ -n "$SSH_TTY" ]; then
+	if [ -n "$SSH_CONNECTION" ]; then
 		eval "$(keychain --eval --quiet)"
 	fi
 fi
