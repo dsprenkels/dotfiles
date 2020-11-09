@@ -48,3 +48,9 @@ if [[ $(hostname) == aang ]]; then
 		eval "$(keychain --eval --quiet)"
 	fi
 fi
+
+readonly RIPGREP="$(which rg)"
+function rg()
+{
+	"$RIPGREP" --pretty "$@" | less -RFX
+}
