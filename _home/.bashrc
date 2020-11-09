@@ -48,8 +48,3 @@ if [[ $(hostname) == aang ]]; then
 		eval "$(keychain --eval --quiet)"
 	fi
 fi
-
-function rg()
-{
-	rg --pretty "$@" | less -R
-}
