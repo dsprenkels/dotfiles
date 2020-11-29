@@ -49,6 +49,11 @@ if [[ $(hostname) == aang ]]; then
 	fi
 fi
 
+# also use keychain by default on suyin-arch
+if [[ $(hostname) == suyin-arch ]]; then
+	eval "$(keychain --eval --quiet)"
+fi
+
 readonly RIPGREP="$(which rg)"
 function rg()
 {
