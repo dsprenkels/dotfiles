@@ -1,0 +1,26 @@
+IMAPAccount fastmail
+Host imap.fastmail.com
+Timeout 120
+User dsprenkels@fastmail.com
+PassCmd "pass show /fastmail.com/mbsync | head -n 1"
+SSLType IMAPS
+SSLVersions TLSv1.2
+
+IMAPStore fastmail-remote
+Account fastmail
+
+MaildirStore fastmail-local
+Subfolders Verbatim
+# The trailing "/" is important
+Path /home/daan/Documents/Vault/fastmail/
+Inbox /home/daan/Documents/Vault/fastmail/Inbox
+
+Channel fastmail
+Master :fastmail-remote:
+Slave :fastmail-local:
+Patterns *
+Sync Pull
+Create Slave
+Remove None
+Expunge None
+SyncState *
