@@ -1,0 +1,26 @@
+#!/bin/bash
+
+subvolumes=("/home" "/etc" "/var" "/usr/local")
+hostname="$(hostname)"
+
+echo >&2 "Making filesystem snapshot"
+for subvol in "${subvolumes[@]}"; do
+	saveto="/.snapshots/$(date '+%Y%m%d')$(echo "$subvol" | sed 's/\//\-/g')"
+	if [ -e "$saveto" ]; then
+		echo "$saveto already exists, skipping snapshot"
+	else
+		sudo btrfs subvolume snapshot "$subvol" "$saveto"
+	fi
+done
+echo
+
+echo >&2 "Backing up mail"
+mbsync --all
+
+echo >&2 "Performing backups"
+for dir in "Documents" "Videos" "Music" "Games" "Zotero" ".factorio" ".config"; do
+	rsync -ravuzzh --delete "/home/daan/${dir}/" "suki:/volume1/backup_slave/${hostname}/${dir}/"
+	rsync -ravuzh --delete "/home/daan/${dir}/" "helikon:\$HOME/katarastorage/private/backup/${hostname}_backup/${dir}/"
+done
+
+exit 0
