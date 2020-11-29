@@ -1,0 +1,31 @@
+#!/bin/bash
+
+action="$1"
+dir="Documents"
+
+this_host="$(hostname)"
+case "$this_host" in
+    aang)
+        other_host=suyin-arch
+        ;;
+    suyin-arch)
+        other_host=aang
+        ;;
+    *)
+        echo >&2 "incarnate(): not set up for this host ('$this_host'), aborting."
+        return 1
+        ;;
+esac
+
+case "$action" in
+    push)
+        rsync -ravuzh --delete "$HOME/${dir}/" "helikon:katarastorage/private/sync_${this_host}/${dir}/"
+        ;;
+    pull)
+        rsync -ravuzh --delete "helikon:katarastorage/private/sync_${other_host}/${dir}/" "$HOME/${dir}/"
+        ;;
+    *)
+        echo >&2 "incarnate(): usage: incarnate <push|pull>"
+        return 1
+        ;;
+esac
