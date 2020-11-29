@@ -19,10 +19,10 @@ esac
 
 case "$action" in
     push)
-        rsync -ravuzh --delete "$HOME/${dir}/" "helikon:katarastorage/private/sync_${this_host}/${dir}/"
+        rsync -ravuzh --delete "${@:2}" "$HOME/${dir}/" "helikon:katarastorage/private/sync_${this_host}/${dir}/"
         ;;
     pull)
-        rsync -ravuzh --delete "helikon:katarastorage/private/sync_${other_host}/${dir}/" "$HOME/${dir}/"
+        rsync -ravuzh --delete "${@:2}" "helikon:katarastorage/private/sync_${other_host}/${dir}/" "$HOME/${dir}/"
         ;;
     *)
         echo >&2 "incarnate(): usage: incarnate <push|pull>"
