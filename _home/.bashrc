@@ -83,12 +83,12 @@ function incarnate()
 	case "$action" in
 		push)
 			for dir in "Documents" "Videos" "Music" "Games" "Zotero" ".factorio"; do
-				rsync -ravuzhn --delete "$HOME/${dir}/" "helikon:katarastorage/private/sync_${this_host}/${dir}/"
+				rsync -ravuzh --delete "$HOME/${dir}/" "helikon:katarastorage/private/sync_${this_host}/${dir}/"
 			done
 			;;
 		pull)
 			for dir in "Documents" "Videos" "Music" "Games" "Zotero" ".factorio"; do
-				rsync -ravuzhn --delete "helikon:katarastorage/private/sync_${other_host}/${dir}/" "$HOME/${dir}/"
+				rsync -ravuzh --delete "helikon:katarastorage/private/sync_${other_host}/${dir}/" "$HOME/${dir}/"
 			done
 			;;
 		*)
