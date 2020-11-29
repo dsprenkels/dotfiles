@@ -33,7 +33,7 @@ fi
 export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH
 
 # set password store directory
-if [[ $(hostname) == aang ]]; then
+if [[ $(hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	export PASSWORD_STORE_DIR=~/Documents/Vault/password-store
 fi
 
