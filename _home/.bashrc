@@ -42,16 +42,11 @@ if [[ $(hostname) == aang ]]; then
 	alias factorio="firejail \$HOME/Games/Factorio/bin/x64/factorio"
 fi
 
-# use keychain if we're on aang and we are logged in via SSH
-if [[ $(hostname) == aang ]]; then
+# use keychain if we're on aang/suyin-arch and we are logged in via SSH
+if [[ $(hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	if [ -n "$SSH_CONNECTION" ]; then
 		eval "$(keychain --eval --quiet)"
 	fi
-fi
-
-# also use keychain by default on suyin-arch
-if [[ $(hostname) == suyin-arch ]]; then
-	eval "$(keychain --eval --quiet)"
 fi
 
 RIPGREP="$(which rg)"
