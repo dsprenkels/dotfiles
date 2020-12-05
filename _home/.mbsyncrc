@@ -12,8 +12,8 @@ Account fastmail
 MaildirStore fastmail-local
 Subfolders Verbatim
 # The trailing "/" is important
-Path /home/daan/Documents/Vault/fastmail/
-Inbox /home/daan/Documents/Vault/fastmail/Inbox
+Path /volume1/daan/Documents_unsynced/fastmail/
+Inbox /volume1/daan/Documents_unsynced/fastmail/Inbox
 
 Channel fastmail
 Master :fastmail-remote:
