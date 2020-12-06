@@ -18,9 +18,6 @@ echo >&2 "Backing up mail"
 mbsync --all
 
 echo >&2 "Performing backups"
-if [[ "$hostname" == "suyin-arch" ]]; then
-	rsync -ravuzh --backup --backup-dir "rsyncbackup" "/home/daan/Documents_unsynced/" "helikon:\$HOME/katarastorage/private/Documents_unsynced/"
-fi
 for dir in "Documents" "Videos" "Music" "Games" "Zotero" ".factorio" ".config"; do
 	rsync -ravuzzh --delete "/home/daan/${dir}/" "suki:/volume1/backup_slave/${hostname}/${dir}/"
 	rsync -ravuzh --delete "/home/daan/${dir}/" "helikon:\$HOME/katarastorage/private/backup/${hostname}_backup/${dir}/"
