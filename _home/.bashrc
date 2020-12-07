@@ -59,5 +59,5 @@ function rg()
 # add an alias for starting factorio
 if [[ $(hostname) == suyin-arch ]]; then
 	export EDITOR="vim"
-	export PAGER="bat --plain"
+	export PAGER="less"
 fi
