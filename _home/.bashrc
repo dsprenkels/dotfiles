@@ -54,3 +54,10 @@ function rg()
 {
 	"$RIPGREP" --pretty "$@" | less -RFX
 }
+
+# preferred editor, pager on suyin-arch is vim, "bat --plain"
+# add an alias for starting factorio
+if [[ $(hostname) == suyin-arch ]]; then
+	export EDITOR="vim"
+	export PAGER="bat --plain"
+fi
