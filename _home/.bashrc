@@ -22,7 +22,7 @@ alias egrep='egrep --color=auto'
 [[ $- = *i* ]] && source ~/.liquidprompt/liquidprompt
 
 # set gopath
-if [[ $(hostname) == aang ]]; then
+if [[ $(hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	export GOPATH=$HOME/Documents/Code/go
 	export PATH=$PATH:/usr/lib/go-1.6/bin:$GOPATH/bin
 	# [2020-05-08] Fix for being able to compile the Go standard library.
