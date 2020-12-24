@@ -3,6 +3,9 @@
 subvolumes=("/home" "/etc" "/var" "/usr/local")
 hostname="$(hostname)"
 
+echo >&2 "Saving package list"
+pacman -Qe >"$HOME/Documents/Vault/$(hostname)_packages.txt"
+
 echo >&2 "Making filesystem snapshot"
 for subvol in "${subvolumes[@]}"; do
 	saveto="/.snapshots/$(date '+%Y%m%d')$(echo "$subvol" | sed 's/\//\-/g')"
