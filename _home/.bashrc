@@ -61,3 +61,8 @@ if [[ $(hostname) == suyin-arch ]]; then
 	export EDITOR="vim"
 	export PAGER="less"
 fi
+
+# add an alias for `bat --plain`
+if type bat >/dev/null; then
+	alias bp="bat --plain"
+fi
