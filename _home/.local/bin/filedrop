@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+readonly hostname=suki
+
+randdir="$(openssl rand -base64 32 | head -c 14)"
+ssh "$hostname" "mkdir filedrop/$randdir"
+for file in "$@"; do
+    scp "$file" "$hostname:filedrop/$randdir/"
+    echo >&2 "https://ds7s.nl/filedrop/$randdir/$(basename "$file")"
+done
