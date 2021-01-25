@@ -1,10 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 readonly hostname=suki
 
-randdir="$(openssl rand -base64 32 | head -c 14)"
+randdir=
+while [[ $randdir == '' || $randdir == */* || $randdir == *-* ]]; do
+    randdir="$(openssl rand -base64 10 | head -c 14)"
+done
 ssh "$hostname" "mkdir filedrop/$randdir"
 for file in "$@"; do
     scp "$file" "$hostname:filedrop/$randdir/"
