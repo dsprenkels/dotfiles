@@ -6,10 +6,11 @@ readonly hostname=suki
 
 randdir=
 while [[ $randdir == '' || $randdir == */* || $randdir == *-* ]]; do
-    randdir="$(openssl rand -base64 10 | head -c 14)"
+    randdir="$(openssl rand -base64 10 | head -c 14 | sed -e 's/+/-/' -e 's/\//_/')"
 done
 ssh "$hostname" "mkdir filedrop/$randdir"
 for file in "$@"; do
     scp "$file" "$hostname:filedrop/$randdir/"
+    ssh "$hostname" "chmod a+r filedrop/$randdir/$file"
     echo >&2 "https://ds7s.nl/filedrop/$randdir/$(basename "$file")"
 done
