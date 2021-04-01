@@ -66,3 +66,8 @@ fi
 if type bat >/dev/null; then
 	alias bp="bat --plain"
 fi
+
+# add devkitpro tools to path
+if [[ $(hostname) == suyin-arch ]]; then
+	PATH="$PATH:/opt/devkitpro/devkitARM/bin:/opt/devkitpro/tools/bin"
+fi
