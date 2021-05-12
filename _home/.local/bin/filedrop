@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# shellcheck disable=SC2029
 
 set -e
 
@@ -11,6 +13,6 @@ done
 ssh "$hostname" "mkdir filedrop/$randdir"
 for file in "$@"; do
     scp "$file" "$hostname:filedrop/$randdir/"
-    ssh "$hostname" "chmod a+r filedrop/$randdir/$file"
+    ssh "$hostname" "chmod a+r \"filedrop/$randdir/$file\""
     echo >&2 "https://ds7s.nl/filedrop/$randdir/$(basename "$file")"
 done
