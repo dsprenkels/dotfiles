@@ -3,6 +3,10 @@
 subvolumes=("/home" "/etc" "/var" "/usr/local")
 hostname="$(hostname)"
 
+if [[ "$(hostname)" == "suyin-arch" ]]; then
+	subvolumes=("/home/daan" "/etc" "/var" "/usr/local")
+fi
+
 echo >&2 "Saving package list"
 pacman -Qe >"$HOME/Documents/Vault/$(hostname)_packages.txt"
 
