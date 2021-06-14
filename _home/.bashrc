@@ -71,18 +71,3 @@ fi
 if [[ $(hostname) == suyin-arch ]]; then
 	PATH="$PATH:/opt/devkitpro/devkitARM/bin:/opt/devkitpro/tools/bin"
 fi
-
-function check_vaccinations {
-	local year
-
-	for year in 1991 1994; do
-		local its_time_bool
-		its_time_bool="$(wget --quiet -O- "https://user-api.coronatest.nl/vaccinatie/programma/bepaalbaar/$year/NEE/NEE" | jq '.["success"]')"
-		if [[ "$its_time_bool" != "false" ]]; then
-			echo -e "\033[0;32mIt's vaccination time for \033[0;1m$year\033[0;21m\033[0;39m\033[0;0m"
-			echo -e "Go: \033[0;1mhttps://coronatest.nl/\033[0;21m\033[0;0m"
-		fi
-	done
-}
-
-check_vaccinations
