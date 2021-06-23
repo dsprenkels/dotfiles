@@ -63,7 +63,7 @@ if [[ $(hostname) == suyin-arch ]]; then
 fi
 
 # add an alias for `bat --plain`
-if type bat >/dev/null; then
+if type bat >/dev/null 2>/dev/null; then
 	alias bp="bat --plain"
 fi
 
