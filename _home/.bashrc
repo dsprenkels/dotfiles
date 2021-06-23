@@ -21,25 +21,8 @@ alias egrep='egrep --color=auto'
 # shellcheck disable=SC1091
 [[ $- = *i* ]] && source ~/.liquidprompt/liquidprompt
 
-# get the current host's hostname using the hostname binary, or by reading
-# /etc/hostname as fallback.
-function __get_hostname() {
-	local HOSTNAME
-	HOSTNAME="$(hostname 2>/dev/null)"
-	if [[ $? == 127 ]]; then
-		HOSTNAME="$(cat /etc/hostname)"
-		# shellcheck disable=SC2181
-		if [[ $? != 0 ]]; then
-			echo
-			return 1
-		fi
-	fi
-	echo "$HOSTNAME"
-	return 0	
-}
-
 # set gopath
-if [[ $(__get_hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	export GOPATH=$HOME/.cache/go
 	export PATH=$PATH:/usr/lib/go-1.6/bin:$GOPATH/bin
 	# [2020-05-08] Fix for being able to compile the Go standard library.
@@ -50,17 +33,17 @@ fi
 export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH
 
 # set password store directory
-if [[ $(__get_hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	export PASSWORD_STORE_DIR=~/Documents/Vault/password-store
 fi
 
 # add an alias for starting factorio
-if [[ $(__get_hostname) == aang ]]; then
+if [[ $(hostname) == aang ]]; then
 	alias factorio="firejail \$HOME/Games/Factorio/bin/x64/factorio"
 fi
 
 # use keychain if we're on aang/suyin-arch and we are logged in via SSH
-if [[ $(__get_hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	if [ -n "$SSH_CONNECTION" ]; then
 		eval "$(keychain --eval --quiet)"
 	fi
@@ -74,7 +57,7 @@ function rg()
 
 # preferred editor, pager on suyin-arch is vim, "bat --plain"
 # add an alias for starting factorio
-if [[ $(__get_hostname) == suyin-arch ]]; then
+if [[ $(hostname) == suyin-arch ]]; then
 	export EDITOR="vim"
 	export PAGER="less"
 fi
@@ -85,9 +68,6 @@ if type bat >/dev/null 2>/dev/null; then
 fi
 
 # add devkitpro tools to path
-if [[ $(__get_hostname) == suyin-arch ]]; then
+if [[ $(hostname) == suyin-arch ]]; then
 	PATH="$PATH:/opt/devkitpro/devkitARM/bin:/opt/devkitpro/tools/bin"
 fi
-
-# Remove the __get_hostname function, cause we don't need it anymore.
-unset -f __get_hostname
