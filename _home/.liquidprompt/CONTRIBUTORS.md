@@ -96,6 +96,18 @@ Thanks again to everyone for all of the help and support!
 * Tristan Miller (@logological)
 * Markus Gebert (@mgeb)
 * Tore Anderson (@toreanderson)
+* Fabien MARTY (@thefab)
+* Alessio Garzi (@Ozzyboshi)
+* Mathieu MD (@mathieumd)
+* Romano Giannetti (@Rmano)
+* Paulo Cazarotto (@phcco)
+* Jürgen Weigert (@jnweiger)
+* Sven-Hendrik Haase (@svenstaro)
+* Sandro Jäckel (@SuperSandro2000)
+* David Pape (@zyzzyxdonta)
+* Aksel Sjögren (@akselsjogren)
+* Raina Otoni (@rotoni)
+* Munif Tanjim (@MunifTanjim)
 
 ### Code cleanup
 * Aurélien Requiem (@aureq)
@@ -108,6 +120,13 @@ Thanks again to everyone for all of the help and support!
 * Matt Kelly (@mattkelly)
 * Colin Lieberman (@colinlieberman)
 * Bryce Jasmer (@b-jazz)
+
+### Documentation changes / clarifications
+* Arturo Borrero Gonzalez (@aborrero)
+* Brad Beyenhof (@augmentedfourth)
+* John Hamelink (@johnhamelink)
+* @YouthfulIndiscretion
+* Imran Munshi (@imran27)
 
 ### Bug reports / Feature requests
 * @skanx
@@ -190,3 +209,24 @@ Thanks again to everyone for all of the help and support!
 * Gergo Szonyi (@gex)
 * Nolan Leake (@nolanl)
 * Éloi Rivard (@azmeuk)
+* Felix Eckhofer (@tribut)
+* Paul Lhussiez (@Depado)
+* Cyril Bouthors (@cyril-bouthors)
+* Felix Schlitter (@felixSchl)
+* Christoph Burschka (@cburschka)
+* @dreamcat4
+* Munif Tanjim (@MunifTanjim)
+* @ilovezfs
+* Aleksey Tsalolikhin (@atsaloli)
+* Micah Silverman (@dogeared)
+* Rohan Kapadia (@kapad)
+* Jan Gorecki (@jangorecki)
+* Otto Kekäläinen (@ottok)
+* Mike Simonson (@mikeSimonson)
+* Viorel-Cosmin Miron (@uhlhosting)
+* Dimitrie Hoekstra (@dimitrieh)
+* Hynek Vychodil (@pichi)
+* Ned Batchelder (@nedbat)
+* Gary Wolfman (@OldCrow)
+* @Orgams
+* Andrei Matei (@andreimatei)

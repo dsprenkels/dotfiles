@@ -1,0 +1,2344 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "LIQUIDPROMPT" "3" "May 30, 2021" "" "Liquidprompt"
+.SH NAME
+liquidprompt \- Liquidprompt functions
+.sp
+Functions starting with \fBlp\fP or any other alphanumeric character are \fBpublic\fP
+functions designed to be used by users on the command line or in their config.
+.sp
+Functions starting with \fB_lp\fP are \fBtheme\fP level functions, designed to be used
+by themes. These include data, theme, and utility functions.
+.sp
+Functions starting with \fB__lp\fP are \fBinternal\fP functions, designed to be used
+only by Liquidprompt internals. These functions should not be used by users or
+themes, as they are not guaranteed to not change between versions.
+.SH PUBLIC FUNCTIONS
+.sp
+These functions are designed to be used by users on the command line or in
+their config.
+.INDENT 0.0
+.TP
+.B lp_activate()
+Reload the user config.
+.sp
+This function is called when sourcing \fBliquidprompt\fP, unless the flag
+\fB\-\-no\-activate\fP is passed.
+.sp
+The config is sourced, and the environment scanned again for programs needed
+for specific features.
+.sp
+Lastly, \fI\%prompt_on()\fP is called to enabled the prompt.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B lp_title([title_string])
+Set \fItitle_string\fP as the terminal title. This overrides any title set by the
+current theme.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+The input string is not escaped in any way; if it contains characters
+that the shell will interpret, the user must escape them if that behavior
+is not desired.
+.UNINDENT
+.UNINDENT
+.sp
+To unset the manual title, call \fI\%lp_title()\fP with no arguments.
+.sp
+To set a blank title, call \fI\%lp_title()\fP with an empty string argument
+(\fB\(aq\(aq\fP).
+.sp
+This function will do nothing and return \fB2\fP if \fBLP_ENABLE_TITLE\fP
+is \fB0\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B lp_theme(theme_id | \-\-list)
+Load and activate the theme named \fItheme_id\fP\&. The theme functions must be
+loaded into memory before \fI\%lp_theme()\fP can be called, normally by
+sourcing the theme file.
+.sp
+The optional flag \fB\-\-list\fP will instead list all currently loaded
+themes.
+.sp
+This function supports shell autocompletion.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B lp_terminal_format(foreground_color[, background_color][, bold][, underline][, fallback_foreground_color][, fallback_background_color]) -> var:lp_terminal_format
+Generate a shell escaped terminal formatting string for use in \fBPS1\fP\&.
+.sp
+The start of the formatting string always resets back to terminal defaults.
+.sp
+\fIforeground_color\fP and \fIbackground_color\fP accept an
+\fI\%ANSI escape color code\fP integer to set the color of the foreground and
+background, respectively. The behavior depends on the integer:
+.INDENT 7.0
+.IP \(bu 2
+\fB>= 0 && < max_color\fP \- The color is used directly.
+.IP \(bu 2
+\fB>= max_color\fP \- If the terminal reports that the number of colors it
+supports is less than the input color code, the
+\fIfallback_foreground_color\fP or \fIfallback_background_color\fP is used instead.
+.IP \(bu 2
+\fB\-1\fP \- No color is set. This does not mean that the previous color will
+continue over, as all formatting is reset to default at the start of the
+sequence. This means the default coloring is effectively set.
+.IP \(bu 2
+\fB\-2\fP \- The previous color of the field is set. If no color was
+previously set, no color will be set. Note that the output is a static
+formatting string; the string will not keep the same color as the terminal
+previously had, but the color that was last selected when
+\fI\%lp_terminal_format()\fP was last run.
+.IP \(bu 2
+\fB\-3\fP \- Same as \fB\-2\fP, except the opposite field color is copied. In
+other words, if \fIforeground_color\fP is set to \fB\-3\fP, it will copy the
+color of \fIbackground_color\fP the last time \fI\%lp_terminal_format()\fP
+was run.
+.UNINDENT
+.sp
+\fIbold\fP and \fIunderline\fP enable their respective formats when set to \fB1\fP\&.
+If omitted or set to \fB0\fP, they are not enabled. To use fallback colors,
+they will need to be set to be able to set the other options.
+.sp
+\fIfallback_foreground_color\fP and \fIfallback_background_color\fP are used when the
+normal colors are higher than the terminal supported colors. The special
+negative inputs do not work for these options, and they are not checked for
+compatibility before being used, so it is recommended that they are in the
+range \fB0\-7\fP\&.
+When setting \fIforeground_color\fP or \fIbackground_color\fP to negative inputs,
+these options are never checked.
+.sp
+For example, to set the error color to a bright, bold pink, with a fallback
+color of red:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+lp_terminal_format 204 \-1 1 0 1
+LP_COLOR_ERR=$lp_terminal_format
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+To set the prompt mark color to black on a white background:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+lp_terminal_format 0 7
+LP_COLOR_MARK=$lp_terminal_format
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B prompt_on()
+Enable the prompt generation and setting.
+.sp
+This function is called when sourcing \fBliquidprompt\fP, unless the flag
+\fB\-\-no\-activate\fP is passed.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B prompt_off()
+Disable the prompt generation and setting, and restore the old \fBPS1\fP\&.
+.sp
+If the shell is Bash, also restore the old \fBPROMPT_COMMAND\fP\&.
+.sp
+If the shell is Zsh, also restore the old prompt theme.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B prompt_OFF()
+Same as \fI\%prompt_off()\fP, except instead of restoring the previous
+\fBPS1\fP, it is set to "$\ " on Bash, "%\ " on Zsh.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B prompt_tag([prefix_string])
+Sets a prefix that will be displayed before every prompt. Postpends a space
+to the input string.
+.sp
+Internally, this function sets \fBLP_PS1_PREFIX\fP to \fIprefix_string\fP\&.
+If a trailing space is not wanted, set \fBLP_PS1_PREFIX\fP manually.
+.sp
+To unset the prefix, call \fI\%prompt_tag()\fP with no arguments.
+.UNINDENT
+.SH DATA FUNCTIONS
+.INDENT 0.0
+.IP \(bu 2
+\fI\%Battery\fP
+.IP \(bu 2
+\fI\%Development Environment\fP
+.IP \(bu 2
+\fI\%Environment\fP
+.IP \(bu 2
+\fI\%Jobs\fP
+.IP \(bu 2
+\fI\%Load\fP
+.IP \(bu 2
+\fI\%OS\fP
+.IP \(bu 2
+\fI\%Path\fP
+.IP \(bu 2
+\fI\%Runtime\fP
+.IP \(bu 2
+\fI\%Temperature\fP
+.IP \(bu 2
+\fI\%Time\fP
+.UNINDENT
+.SS Version Control Data Functions
+.INDENT 0.0
+.IP \(bu 2
+\fI\%Generic\fP
+.IP \(bu 2
+\fI\%Bazaar\fP
+.IP \(bu 2
+\fI\%Fossil\fP
+.IP \(bu 2
+\fI\%Git\fP
+.IP \(bu 2
+\fI\%Mercurial\fP
+.IP \(bu 2
+\fI\%Subversion\fP
+.UNINDENT
+.sp
+These functions are designed to be used by themes.
+.SS Generic
+.sp
+The generic interface functions are designed to provide a level of abstraction
+over the type of VCS that a user might be using. By using the generic interface,
+a theme can provide a common look for all VCS types.
+See the default theme function \fB_lp_vcs_details_color()\fP for an example of
+this.
+.INDENT 0.0
+.TP
+.B _lp_find_vcs() -> var:lp_vcs_type, var:lp_vcs_root
+Returns \fBtrue\fP if the current directory is part of a version control
+repository. If not, returns \fB1\fP\&. Returns the VCS type ID and the repository
+root directory.
+.sp
+If the current directory is disabled for version control using
+\fBLP_DISABLED_VCS_PATHS\fP (checked using \fI\%_lp_are_vcs_enabled()\fP),
+returns \fB2\fP, and the returned type is set to "disabled".
+.sp
+\fI\%_lp_find_vcs()\fP will only search for VCS types that are not disabled. If
+all VCS types are disabled in the config, \fI\%_lp_find_vcs()\fP will return
+\fB1\fP, as no repository will be found.
+.sp
+This function does a lightweight check for the existence of a version control
+repository, only looking for the existence of a database. It does not check
+if the database is valid or healthy. Use \fI\%_lp_vcs_active()\fP to test for
+that.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_are_vcs_enabled()
+Returns \fBtrue\fP if the current directory is not excluded by the config
+option \fBLP_DISABLED_VCS_PATHS\fP\&.
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+All following generic functions need \fI\%_lp_find_vcs()\fP to be run first, as
+they need \fBlp_vcs_type\fP to be set.
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_active()
+Returns \fBtrue\fP if the detected VCS is enabled in Liquidprompt and the
+current directory is a valid repository of that type. This check should be
+done before running any other \fB_lp_vcs_*\fP data functions, but can be
+omitted for speed reasons if the checks done by \fI\%_lp_find_vcs()\fP are good
+enough.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+All following generic functions can exit with return codes higher than their
+normal disabled exit code. If the active VCS does not support a feature, the
+data function will not be defined, and therefore the shell will return an
+error code much higher than \fB2\fP\&. Compare using greater\-or\-equal if checking
+for not supported error codes.
+.sp
+Unless otherwise documented, the following functions return \fB0\fP for good
+data, \fB1\fP for no data, and \fB2\fP or higher for unsupported function.
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_bookmark() -> var:lp_vcs_bookmark
+Returns \fBtrue\fP if a bookmark is active in the repository. Returns the
+bookmark name.
+.sp
+Most VCS providers do not support bookmarks.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_branch() -> var:lp_vcs_branch
+Returns \fBtrue\fP if a branch is active in the repository. Returns the branch
+name.
+.sp
+For some VCS providers, a branch is always active.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_commit_id() -> var:lp_vcs_commit_id
+Returns the full commit ID of the current commit. The return code is not
+defined.
+.sp
+Some VCS providers use hashes, while others use incrementing revision
+numbers. All VCS providers support some form of ID. The returned string
+should be unique enough that a user can identify the commit.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_commits_off_remote() -> var:lp_vcs_commit_ahead,                                            var:lp_vcs_commit_behind
+Returns \fBtrue\fP if there are commits on the current branch that are not on
+the remote tracking branch, or commits on the remote tracking branch that are
+not on this branch. Returns \fB1\fP if there are no differing commits. Returns
+\fB2\fP if there is no matching remote tracking branch. Returns \fB3\fP or higher
+if the VCS provider does not support remote tracking branches.
+.sp
+Returns the number of commits behind and ahead.
+.sp
+Most VCS providers do not support remote tracking branches.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_head_status() -> var:lp_vcs_head_status,                                     var:lp_vcs_head_details
+Return \fBtrue\fP if the repo is in a special or unusual state. Return the
+special status, and any extra details (like progress in a rebase) if
+applicable.
+.sp
+Many VCS providers do not have such information. This info is unlikely to be
+similar across VCSs, and should probably be displayed to a user without
+manipulation.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+The details are optional, and might not be set. Protect it with
+\fB"${lp_vcs_head_details\-}"\fP\&.
+.UNINDENT
+.UNINDENT
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_staged_files() -> var:lp_vcs_staged_files
+Returns \fBtrue\fP if any staged files exist in the repository. In other words,
+tracked files that contain staged changes. Returns the number of staged
+files.
+.sp
+Many VCS providers do not support staging.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_staged_lines() -> var:lp_vcs_staged_i_lines, var:lp_vcs_staged_d_lines
+Returns \fBtrue\fP if any staged lines exist in the repository. In other words,
+tracked files that contain staged changes. Returns the number of staged
+lines.
+.sp
+Many VCS providers do not support staging.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_stash_count() -> var:lp_vcs_stash_count
+Returns \fBtrue\fP if there are stashes the repository. Returns the
+number of stashes.
+.sp
+Some VCS providers refer to stashes as "shelves".
+.sp
+Some VCS providers do not support stashes.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_tag() -> var:lp_vcs_tag
+Returns \fBtrue\fP if a tag is active in the repository. Returns the
+tag name.
+.sp
+A tag will only be returned if it is a unique ID that points only to the
+current commit.
+.sp
+If multiple tags match, only one is returned. Which tag is selected is not
+defined.
+.sp
+Some VCS providers do not support unique tags.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_uncommitted_files() -> var:lp_vcs_uncommitted_files
+Returns \fBtrue\fP if any uncommitted files exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted files.
+.sp
+Some VCS providers refer to uncommitted files as "modified" files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_uncommitted_lines() -> var:lp_vcs_uncommitted_i_lines, var:lp_vcs_uncommitted_d_lines
+Returns \fBtrue\fP if any uncommitted lines exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted lines.
+.sp
+Some VCS providers refer to uncommitted lines as "modified" or "changed"
+lines.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_unstaged_files() -> var:lp_vcs_unstaged_files
+Returns \fBtrue\fP if any unstaged files exist in the repository. In other
+words, tracked files that contain unstaged changes. Returns the number of
+unstaged files.
+.sp
+Many VCS providers do not support staging.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_unstaged_lines() -> var:lp_vcs_unstaged_i_lines, var:lp_vcs_unstaged_d_lines
+Returns \fBtrue\fP if any unstaged lines exist in the repository. In other
+words, tracked files that contain unstaged changes. Returns the number of
+unstaged lines.
+.sp
+Many VCS providers do not support staging.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_untracked_files() -> var:lp_vcs_untracked_files
+Returns \fBtrue\fP if any untracked files exist in the repository. Returns the
+number of untracked files.
+.sp
+Some VCS providers refer to untracked files as "extra" files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Bazaar
+.sp
+\fBWARNING:\fP
+.INDENT 0.0
+.INDENT 3.5
+Bazaar is no longer being actively developed, and depends on Python 2, which
+is no longer supported. \fI\%Breezy\fP is a fork
+that can work with Bazaar repositories. To use Breezy in place of Bazaar, set
+a wrapper function:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+bzr() { brz "$@"; }
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Bazaar does not support bookmarks.
+A nick is somewhat like a bookmark, but there is no command to view a naked
+branch name, so the \fBnick\fP command is used for branches.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Bazaar does not support a staging area.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Bazaar does not support getting details of remote tracking branches.
+Bazaar does not keep a local copy of the remote state, so checking this
+would be impossible anyway.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Bazaar does not have extra head statuses. A Bazaar merge can be partially
+complete, but there is no command to test for it.
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_bzr_active()
+Returns \fBtrue\fP if Bazaar is enabled in Liquidprompt and the current
+directory is a valid Bazaar repository. This check should be done before
+running any other \fB_lp_bzr_*\fP data functions if accessing the Bazaar
+data functions directly instead of through the generic interface.
+.sp
+Can be disabled by \fBLP_ENABLE_BZR\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_bzr_branch() -> var:lp_vcs_branch
+Returns \fBtrue\fP if a branch is active in the repository. Returns the branch
+name.
+.sp
+Changed in version 2.0: Return method changed from stdout.
+No branch now returns \fBfalse\fP\&.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_bzr_commit_id() -> var:lp_vcs_commit_id
+Returns the revision number of the current commit. The return code is not
+defined.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_bzr_stash_count() -> var:lp_vcs_stash_count
+Returns \fBtrue\fP if there are shelves the repository. Returns the
+number of shelves.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_bzr_tag() -> var:lp_vcs_tag
+Returns \fBtrue\fP if a tag is active in the repository. Returns the
+tag name.
+.sp
+If multiple tags match, only one is returned. Which tag is selected is not
+defined.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_bzr_uncommitted_files() -> var:lp_vcs_uncommitted_files
+Returns \fBtrue\fP if any uncommitted files exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_bzr_uncommitted_lines() -> var:lp_vcs_uncommitted_i_lines, var:lp_vcs_uncommitted_d_lines
+Returns \fBtrue\fP if any uncommitted lines exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted lines.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_bzr_untracked_files() -> var:lp_vcs_untracked_files
+Returns \fBtrue\fP if any untracked files exist in the repository. Returns the
+number of untracked files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Fossil
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Fossil does not support bookmarks.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Fossil does not support a staging area.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Fossil does not support unique tags. Fossil tags can refer to multiple
+checkin IDs, so a matching tag is not a useful unique ID.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Fossil does not support remote tracking branches. Fossil by default keeps the
+local repository in sync with the remote. Even if a user disables that, it is
+not possible to have a local and remote branch named the same not in sync.
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_fossil_active()
+Returns \fBtrue\fP if Fossil is enabled in Liquidprompt and the current
+directory is a valid Fossil repository. This check should be done before
+running any other \fB_lp_fossil_*\fP data functions if accessing the Fossil
+data functions directly instead of through the generic interface.
+.sp
+Can be disabled by \fBLP_ENABLE_FOSSIL\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_fossil_branch() -> var:lp_vcs_branch
+Returns \fBtrue\fP if a branch is active in the repository. Returns the branch
+name.
+.sp
+Changed in version 2.0: Return method changed from stdout.
+No branch now returns \fBfalse\fP and nothing instead of "no\-branch".
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_fossil_commit_id() -> var:lp_vcs_commit_id
+Returns the full commit hash of the current commit. The return code is not
+defined.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_fossil_head_status() -> var:lp_vcs_head_status
+Return \fBtrue\fP if the repository is in a special or unusual state. Return
+the special status.
+.sp
+Does not return any extra details.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_fossil_stash_count() -> var:lp_vcs_stash_count
+Returns \fBtrue\fP if there are stashes the repository. Returns the
+number of stashes.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_fossil_uncommitted_files() -> var:lp_vcs_uncommitted_files
+Returns \fBtrue\fP if any uncommitted files exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_fossil_uncommitted_lines() -> var:lp_vcs_uncommitted_i_lines, var:lp_vcs_uncommitted_d_lines
+Returns \fBtrue\fP if any uncommitted lines exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted lines.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_fossil_untracked_files() -> var:lp_vcs_untracked_files
+Returns \fBtrue\fP if any untracked files exist in the repository. Returns the
+number of untracked files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Git
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Git does not support bookmarks.
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_active()
+Returns \fBtrue\fP if Git is enabled in Liquidprompt and the current directory
+is a valid Git repository. This check should be done before running any other
+\fB_lp_git_*\fP data functions if accessing the Git data functions directly
+instead of through the generic interface.
+.sp
+Can be disabled by \fBLP_ENABLE_GIT\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_branch() -> var:lp_vcs_branch
+Returns \fBtrue\fP if a branch is active in the repository. Returns the branch
+name.
+.sp
+Changed in version 2.0: Return method changed from stdout.
+No branch now returns \fBfalse\fP and nothing instead of commit ID.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_commit_id() -> var:lp_vcs_commit_id
+Returns the full commit hash of the current commit. The return code is not
+defined.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_commits_off_remote() -> var:lp_vcs_commit_ahead,                                            var:lp_vcs_commit_behind
+Returns \fBtrue\fP if there are commits on the current branch that are not on
+the remote tracking branch, or commits on the remote tracking branch that are
+not on this branch. Returns \fB1\fP if there are no differing commits. Returns
+\fB2\fP if there is no matching remote tracking branch.
+.sp
+Returns the number of commits behind and ahead.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_head_status() -> var:lp_vcs_head_status,                                     var:lp_vcs_head_details
+Return \fBtrue\fP if the repository is in a special or unusual state. Return
+the special status, and any extra details (like progress in a rebase) if
+applicable.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_staged_files() -> var:lp_vcs_staged_files
+Returns \fBtrue\fP if any staged files exist in the repository. In other words,
+tracked files that contain staged changes. Returns the number of staged
+files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_staged_lines() -> var:lp_vcs_staged_i_lines, var:lp_vcs_staged_d_lines
+Returns \fBtrue\fP if any staged lines exist in the repository. In other words,
+tracked files that contain staged changes. Returns the number of staged
+lines.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_stash_count() -> var:lp_vcs_stash_count
+Returns \fBtrue\fP if there are stashes the repository. Returns the
+number of stashes.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_tag() -> var:lp_vcs_tag
+Returns \fBtrue\fP if a tag is active in the repository. Returns the
+tag name.
+.sp
+If multiple tags match, only one is returned. Which tag is selected is not
+defined.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_uncommitted_files() -> var:lp_vcs_uncommitted_files
+Returns \fBtrue\fP if any uncommitted files exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_uncommitted_lines() -> var:lp_vcs_uncommitted_i_lines, var:lp_vcs_uncommitted_d_lines
+Returns \fBtrue\fP if any uncommitted lines exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted lines.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_unstaged_files() -> var:lp_vcs_unstaged_files
+Returns \fBtrue\fP if any unstaged files exist in the repository. In other
+words, tracked files that contain unstaged changes. Returns the number of
+unstaged files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_unstaged_lines() -> var:lp_vcs_unstaged_i_lines, var:lp_vcs_unstaged_d_lines
+Returns \fBtrue\fP if any unstaged lines exist in the repository. In other
+words, tracked files that contain unstaged changes. Returns the number of
+unstaged lines.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_git_untracked_files() -> var:lp_vcs_untracked_files
+Returns \fBtrue\fP if any untracked files exist in the repository. Returns the
+number of untracked files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Mercurial
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Mercurial does not support a staging area.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Mercurial remote tracking branches are disabled (see
+\fI\%_lp_hg_commits_off_remote()\fP).
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_active()
+Returns \fBtrue\fP if Mercurial is enabled in Liquidprompt and the current
+directory is a valid Mercurial repository. This check should be done before
+running any other \fB_lp_hg_*\fP data functions if accessing the Mercurial data
+functions directly instead of through the generic interface.
+.sp
+Can be disabled by \fBLP_ENABLE_HG\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_bookmark() -> var:lp_vcs_bookmark
+Returns \fBtrue\fP if a bookmark is active in the repository. Returns the
+bookmark name.
+.sp
+Mercurial bookmarks work more like Git branches.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_branch() -> var:lp_vcs_branch
+Returns \fBtrue\fP if a branch is active in the repository. Returns the branch
+name.
+.sp
+All Mercurial commits have a branch, so this function should always return
+\fBtrue\fP\&. A closer analog to Git branches are Mercurial bookmarks (see
+\fI\%_lp_hg_bookmark()\fP).
+.sp
+Changed in version 2.0: Return method changed from stdout.
+No branch now returns \fBfalse\fP\&.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_commit_id() -> var:lp_vcs_commit_id
+Returns the full global revision ID of the current commit. The return code is
+not defined.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_commits_off_remote()
+Returns \fB3\fP (disabled).
+.sp
+Mercurial does not keep a local copy of the remote state, so checking this
+will require a connection to the remote server. This means it is often
+prohibitively time expensive, and therefore should not be used in a prompt.
+See \fI\%issue #217\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_head_status() -> var:lp_vcs_head_status
+Return \fBtrue\fP if the repository is in a special or unusual state. Return
+the special status.
+.sp
+Does not return any extra details.
+.sp
+This function depends on \fI\%_lp_find_vcs()\fP being run first to set
+\fBlp_vcs_root\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_stash_count() -> var:lp_vcs_stash_count
+Returns \fBtrue\fP if there are shelves the repository. Returns the
+number of shelves.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_tag() -> var:lp_vcs_tag
+Returns \fBtrue\fP if a tag is active in the repository. Returns the
+tag name.
+.sp
+If multiple tags match, only one is returned. Which tag is selected is not
+defined.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_uncommitted_files() -> var:lp_vcs_uncommitted_files
+Returns \fBtrue\fP if any uncommitted files exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_uncommitted_lines() -> var:lp_vcs_uncommitted_i_lines, var:lp_vcs_uncommitted_d_lines
+Returns \fBtrue\fP if any uncommitted lines exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted lines.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hg_untracked_files() -> var:lp_vcs_untracked_files
+Returns \fBtrue\fP if any untracked files exist in the repository. Returns the
+number of untracked files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Subversion
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Subversion does not support bookmarks.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Subversion does not support a staging area.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Subversion does not support stashes.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Subversion does not have extra head statuses. A Subversion merge is no
+different than a manual file change, so the repository has no extra state to
+track.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Subversion does not support remote tracking branches (as it is not a
+distributed version control system).
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Subversion does not support tags. What are generally agreed upon as being
+tags are internally branches. These are returned by \fI\%_lp_svn_branch()\fP\&.
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_svn_active()
+Returns \fBtrue\fP if Subversion is enabled in Liquidprompt and the current
+directory is a valid Subversion repository. This check should be done before
+running any other \fB_lp_svn_*\fP data functions if accessing the Subversion
+data functions directly instead of through the generic interface.
+.sp
+Can be disabled by \fBLP_ENABLE_SVN\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_svn_branch() -> var:lp_vcs_branch
+Returns \fBtrue\fP if a branch is active in the repository. Returns the branch
+name.
+.sp
+Subversion "tags" are really branches under a "tag" directory. Tags are
+returned as their directory name, prefixed with "tag/".
+.sp
+Changed in version 2.0: Return method changed from stdout.
+No branch now returns \fBfalse\fP and nothing instead of the current
+directory.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_svn_commit_id() -> var:lp_vcs_commit_id
+Returns the revision number of the current commit. The return code is not
+defined.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_svn_uncommitted_files() -> var:lp_vcs_uncommitted_files
+Returns \fBtrue\fP if any uncommitted files exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_svn_uncommitted_lines() -> var:lp_vcs_uncommitted_i_lines, var:lp_vcs_uncommitted_d_lines
+Returns \fBtrue\fP if any uncommitted lines exist in the repository. In other
+words, tracked files that contain uncommitted changes. Returns the number of
+uncommitted lines.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_svn_untracked_files() -> var:lp_vcs_untracked_files
+Returns \fBtrue\fP if any untracked files exist in the repository. Returns the
+number of untracked files.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.sp
+These functions are designed to be used by themes.
+.sp
+All data functions will return \fBtrue\fP (meaning return code \fB0\fP) when they
+are both enabled and have data. They will return \fBfalse\fP (meaning return code
+\fB1\fP) when they do not have data. Most will return \fB2\fP when they are
+disabled, either through the config or because the tool they depend on is not
+installed. Such disable config options will be documented. Exceptions to this
+rule are explicitly documented.
+.sp
+When a function returns \fBfalse\fP, any return variables are not guaranteed to
+be set. If running with \fBset \-u\fP (or when building a theme to be
+distributed), guard any return variable accesses with a check of the return
+code, or use \fB${var\-}\fP syntax.
+.SS Battery
+.INDENT 0.0
+.TP
+.B _lp_battery() -> var:lp_battery
+Returns a return code depending on the status of the battery:
+.INDENT 7.0
+.IP \(bu 2
+\fB5\fP if the battery feature is disabled or not available
+.IP \(bu 2
+\fB4\fP if no battery level is found
+.IP \(bu 2
+\fB3\fP if charging and the level is above the threshold
+.IP \(bu 2
+\fB2\fP if charging and the level is under the threshold
+.IP \(bu 2
+\fB1\fP if discharging and the level is above the threshold
+.IP \(bu 2
+\fB0\fP if discharging and the level is under the threshold
+.UNINDENT
+.sp
+Returns an integer percentage of the current battery level.
+.sp
+If the threshold is not surpassed, the battery level is still returned.
+.sp
+The threshold is configured with \fBLP_BATTERY_THRESHOLD\fP\&.
+.sp
+Can be disabled by \fBLP_ENABLE_BATT\fP\&.
+.UNINDENT
+.SS Development Environment
+.INDENT 0.0
+.TP
+.B _lp_python_env() -> var:lp_python_env
+Retuns \fBtrue\fP if a Python or Conda environment is detected. Returns the
+virtual environment name.
+.sp
+If the environment name contains a forward slash (\fB/\fP), only the substring
+after the last forward slash is returned.
+.sp
+Can be disabled by \fBLP_ENABLE_VIRTUALENV\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_software_collections() -> var:lp_software_collections
+Returns \fBtrue\fP if a \fI\%Red Hat Software Collection\fP is enabled. Returns the
+software collection name.
+.sp
+If the software collection name has trailing whitespace, it is removed.
+.sp
+Can be disabled by \fBLP_ENABLE_SCLS\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Environment
+.INDENT 0.0
+.TP
+.B _lp_connected_display()
+Returns \fBtrue\fP if there is a connected X11 display.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_connection() -> var:lp_connection
+Returns a string matching the connection context of the shell. Valid values:
+.INDENT 7.0
+.IP \(bu 2
+\fBssh\fP \- connected over OpenSSH
+.IP \(bu 2
+\fBlcl\fP \- running in a local terminal
+.IP \(bu 2
+\fBsu\fP \- running in a \fBsu\fP or \fBsudo\fP shell
+.IP \(bu 2
+\fBtel\fP \- connected over Telnet
+.UNINDENT
+.sp
+It is not possible for more than one context to be returned. The contexts
+are checked in the order listed above, and the first one found will be
+returned.
+.sp
+It is not possible for no context to be returned.
+.sp
+Changed in version 2.0: Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_dirstack() -> var:lp_dirstack
+Returns \fBtrue\fP if directory stack support is enabled and the directory
+stack contains more than one directory. In that case, the return variable
+is set to the number of directories on the stack.
+.sp
+Can be enabled by \fBLP_ENABLE_DIRSTACK\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_error() -> var:lp_error
+Returns \fBtrue\fP if the last user shell command returned a non\-zero exit
+code. Returns (in the return variable) the exit code of that command.
+.sp
+Can be disabled by \fBLP_ENABLE_ERROR\fP\&.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+The return variable \fBlp_error\fP will always be set with the last command
+return code, as it must be the first thing done by the prompt. This
+function should still be used, as it checks for the feature being
+disabled by the user.
+.UNINDENT
+.UNINDENT
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_http_proxy() -> var:lp_http_proxy
+Returns \fBtrue\fP if an HTTP or HTTPS proxy is enabled through environment
+variables in the shell. Returns the first found proxy string.
+.sp
+Can be disabled by \fBLP_ENABLE_PROXY\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_multiplexer() -> var:lp_mulitplexer
+Returns \fBtrue\fP if the current shell context is inside a terminal
+multiplexer. Returns a string matching the multiplexer:
+.INDENT 7.0
+.IP \(bu 2
+\fBtmux\fP
+.IP \(bu 2
+\fBscreen\fP
+.UNINDENT
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_terminal_device() -> var:lp_terminal_device
+Returns the basename of the terminal device connected to the shell\(aqs standard
+input.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+This value should never change during the life of the shell.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+This data source is unlikely to be wanted by the user, and should not be
+included in themes by default.
+.UNINDENT
+.UNINDENT
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Jobs
+.INDENT 0.0
+.TP
+.B _lp_detached_sessions() -> var:lp_detached_sessions
+Returns \fBtrue\fP if any detached multiplexer sessions are found. Returns an
+integer count of how many sessions were found.
+.sp
+Can be disabled by \fBLP_ENABLE_DETACHED_SESSIONS\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_jobcount() -> var:lp_running_jobs, var:lp_stopped_jobs
+Returns \fBtrue\fP if any shell background jobs are found. Returns an integer
+count of how many jobs are running and how many are stopped.
+.sp
+Stopped jobs are jobs suspended with Ctrl\-Z.
+.sp
+Running jobs are jobs started with the \fBcommand &\fP syntax, or stopped jobs
+started again with the \fBbg\fP command.
+.sp
+Can be disabled by \fBLP_ENABLE_JOBS\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Load
+.INDENT 0.0
+.TP
+.B _lp_cpu_load() -> var:lp_cpu_load
+Returns a string of the system load average smallest increment, usually 1
+minute. The return code is not defined.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_load() -> var:lp_load, var:lp_load_adjusted
+Returns \fBtrue\fP if the system load average scaled by CPU count is greater
+than the threshold. Returns the system load average in \fIlp_load\fP, and the
+average scaled by CPU count, multiplied by 100 in \fIlp_load_adjusted\fP\&. In
+other words, the load average is multiplied by 100, then divided by the
+number of CPU cores.
+.sp
+\fIlp_load\fP should be displayed to the user, while \fIlp_load_adjusted\fP should be
+used to compare values between machines using \fBLP_LOAD_CAP\fP\&. The
+default theme uses this to generate a color scale.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+\fBLP_LOAD_CAP\fP is a raw floating point configuration value that is
+difficult to do math on. \fB_LP_LOAD_CAP\fP contains the same value, but
+multiplied by 100 to make comparisons to \fIlp_load_adjusted\fP simple. Use
+it along with \fIlp_load_adjusted\fP as arguments to \fB_lp_color_map()\fP\&.
+.UNINDENT
+.UNINDENT
+.sp
+If the threshold is not surpassed, the load average is still returned.
+.sp
+The threshold is configured with \fBLP_LOAD_THRESHOLD\fP\&.
+.sp
+Can be disabled by \fBLP_ENABLE_LOAD\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS OS
+.INDENT 0.0
+.TP
+.B _lp_chroot() -> var:lp_chroot
+Returns \fBtrue\fP if a chroot environment is detected. Returns a string
+matching the chroot string if one is found.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hostname() -> var:lp_hostname
+Returns \fBtrue\fP if a hostname should be displayed. Returns \fB1\fP if the
+connection type is local and \fBLP_HOSTNAME_ALWAYS\fP is not \fB1\fP\&.
+.sp
+Returns the hostname string.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+The returned string is not the real hostname, instead it is the shell
+escape code for hostname, so the shell will substitute the real user ID
+when it evaluates \fBPS1\fP\&.
+.UNINDENT
+.UNINDENT
+.sp
+Deprecated since version 2.0: Also sets \fBLP_HOST_SYMBOL\fP to the same return string.
+
+.sp
+Can be disabled by \fBLP_HOSTNAME_ALWAYS\fP set to \fB\-1\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_sudo_active()
+Returns \fBtrue\fP if \fBsudo\fP is currently activated with valid credentials.
+If \fBsudo\fP is configured to always allow a user to run commands with no
+password, this will always return \fBtrue\fP\&.
+.sp
+Can be disabled by \fBLP_ENABLE_SUDO\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_user()
+Returns a return code depending on the logged in user:
+.INDENT 7.0
+.IP \(bu 2
+\fB2\fP \- the user is root
+.IP \(bu 2
+\fB1\fP \- the user is a user other than the original login user
+.IP \(bu 2
+\fB0\fP \- the user is the login user
+.UNINDENT
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_username() -> var:lp_username
+Returns \fBtrue\fP if a username should be displayed. Returns \fB1\fP if the
+user is the login user and \fBLP_USER_ALWAYS\fP is not \fB1\fP\&.
+.sp
+Returns the current user ID.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+The returned string is not a real user ID, instead it is the shell escape
+code for user, so the shell will substitute the real user ID when it
+evaluates \fBPS1\fP\&.
+.UNINDENT
+.UNINDENT
+.sp
+Can be disabled by \fBLP_USER_ALWAYS\fP set to \fB\-1\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Path
+.INDENT 0.0
+.TP
+.B _lp_path_format(path_format=$LP_COLOR_PATH, last_directory_format=$path_format, vcs_root_format=$last_directory_format, shortened_directory_format=$path_format, separator="/"[, separator_format]) -> var:lp_path, var:lp_path_format
+Returns a shortened and formatted string indicating the current working
+directory path. \fIlp_path\fP contains the path without any formatting or custom
+separators, intended for use in the terminal title. \fIlp_path_format\fP contains
+the complete formatted path, to be inserted into the prompt.
+.sp
+The behavior of the shortening is controlled by
+\fBLP_ENABLE_SHORTEN_PATH\fP, \fBLP_PATH_METHOD\fP,
+\fBLP_PATH_LENGTH\fP, \fBLP_PATH_KEEP\fP, \fBLP_PATH_CHARACTER_KEEP\fP,
+and \fBLP_PATH_VCS_ROOT\fP\&. See their descriptions for details on how they
+change the output of this function.
+.sp
+The last directory in the displayed path will be shown with the
+\fIlast_directory_format\fP\&.
+.sp
+If a VCS repository is detected with \fB_lp_find_vcs()\fP, the root of the
+VCS repository is formatted with \fIvcs_root_format\fP\&. The detection method is
+the same as for all other VCS display, so if a VCS type or directory is
+disabled, it will not be detected.
+.sp
+If the path shortening shortens a directory (or multiple consecutive
+directories), they will be formatted with \fIshortened_directory_format\fP\&.
+.sp
+A custom \fIseparator\fP will only be substituted in the \fIlp_path_format\fP output.
+Note that this will cut into maximum path length if the separator is longer
+than one character.
+.sp
+With no specified \fIseparator_format\fP, each separator will take the format of
+the directory section preceding it. Otherwise every separator will be
+formatted with \fIseparator_format\fP\&. Note that the root directory is treated as
+a directory, and is formatted as such.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Runtime
+.INDENT 0.0
+.TP
+.B _lp_runtime_format() -> var:lp_runtime_format
+Returns \fBtrue\fP if the last command runtime was greater than the threshold.
+Returns a formatted string of the total runtime, split into days, hours,
+minutes, and seconds. Ex: \fB3h27m6s\fP\&.
+.sp
+The threshold is configured with \fBLP_RUNTIME_THRESHOLD\fP\&.
+.sp
+Can be disabled by \fBLP_ENABLE_RUNTIME\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Temperature
+.INDENT 0.0
+.TP
+.B _lp_temperature() -> var:lp_temperature
+Returns \fBtrue\fP if the highest system temperature is greater than the
+threshold. Returns the highest temperature integer.
+.sp
+If the threshold is not surpassed, the highest temperature is still returned.
+.sp
+If no temperature data is found, returns \fBfalse\fP and \fIlp_temperature\fP will
+not be set.
+.sp
+The threshold is configured with \fBLP_TEMP_THRESHOLD\fP\&.
+.sp
+Can be disabled by \fBLP_ENABLE_TEMP\fP\&.
+.sp
+New in version 2.0: Note that a function by this name was renamed to
+\fB_lp_temperature_color\fP\&.
+
+.UNINDENT
+.SS Time
+.INDENT 0.0
+.TP
+.B _lp_time() -> var:lp_time
+Returns \fBtrue\fP if digital time is enabled. Returns the current digital time
+string.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+The returned string is not the real time, instead it is the shell escape
+code for time, so the shell will substitute the real current time when it
+evaluates \fBPS1\fP\&.
+.UNINDENT
+.UNINDENT
+.sp
+Can be disabled by \fBLP_ENABLE_TIME\fP or \fBLP_TIME_ANALOG\fP set to
+\fB1\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_analog_time() -> var:lp_analog_time
+Returns \fBtrue\fP if analog time is enabled. Returns the current analog time
+as a single Unicode character, accurate to the closest 30 minutes.
+.sp
+Can be disabled by \fBLP_ENABLE_TIME\fP or \fBLP_TIME_ANALOG\fP set to
+\fB0\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SH DEFAULT THEME FUNCTIONS
+.INDENT 0.0
+.IP \(bu 2
+\fI\%Theme Functions\fP
+.IP \(bu 2
+\fI\%Theme Data Functions\fP
+.UNINDENT
+.sp
+These functions are designed to be used by the default theme, but are documented
+here so that other themes can use these functions to reduce duplication if
+sections from the default theme are wanted.
+.SS Theme Functions
+.INDENT 0.0
+.TP
+.B _lp_default_theme_activate()
+Setup the defaults and static pieces of the default theme.
+.sp
+Uses colors:
+.INDENT 7.0
+.IP \(bu 2
+\fBLP_COLOR_IN_MULTIPLEXER\fP
+.IP \(bu 2
+\fBLP_COLOR_MARK\fP
+.IP \(bu 2
+\fBLP_COLOR_MARK_ROOT\fP
+.IP \(bu 2
+\fBLP_COLOR_PATH_ROOT\fP
+.IP \(bu 2
+\fBLP_COLOR_USER_ALT\fP
+.IP \(bu 2
+\fBLP_COLOR_USER_LOGGED\fP
+.IP \(bu 2
+\fBLP_COLOR_USER_ROOT\fP
+.UNINDENT
+.sp
+And marks:
+.INDENT 7.0
+.IP \(bu 2
+\fBLP_MARK_BRACKET_OPEN\fP
+.IP \(bu 2
+\fBLP_MARK_BRACKET_CLOSE\fP
+.IP \(bu 2
+\fBLP_MARK_DEFAULT\fP
+.UNINDENT
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_default_theme_directory()
+Setup the colors for the directory when the current working directory
+changes.
+.sp
+Uses colors:
+.INDENT 7.0
+.IP \(bu 2
+\fBLP_COLOR_NOWRITE\fP
+.IP \(bu 2
+\fBLP_COLOR_PATH\fP
+.IP \(bu 2
+\fBLP_COLOR_WRITE\fP
+.UNINDENT
+.sp
+And mark \fBLP_MARK_PERM\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_default_theme_prompt()
+Runs \fI\%_lp_default_theme_prompt_data()\fP then
+\fI\%_lp_default_theme_prompt_template()\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_default_theme_prompt_data()
+Runs all of the below theme data functions, and writes values to the
+\&../theme/default variables. Can be used to generate all the default
+theme sections, then modify them before running a user template.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_default_theme_prompt_template()
+If \fBLP_PS1_FILE\fP is set, sources it.
+.sp
+Then, if \fBLP_PS1\fP is set, uses it as \fBPS1\fP\&. Otherwise, uses the
+default theme layout to construct \fBPS1\fP\&. Can be used to set different
+template sections than the default theme, but still use the same template
+engine.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Theme Data Functions
+.sp
+These functions wrap data with color and/or other formatting. Their
+return codes are the same as the data functions they wrap unless otherwise
+documented.
+.sp
+The interface of the functions will not change between minor versions, but the
+specific text and formatting may change.
+.INDENT 0.0
+.TP
+.B _lp_analog_time_color() -> var:lp_analog_time_color
+Returns \fB_lp_analog_time()\fP with color from \fBLP_COLOR_TIME\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_battery_color() -> var:lp_battery_color
+Returns data from \fB_lp_battery()\fP, colored with:
+.INDENT 7.0
+.IP \(bu 2
+\fBLP_COLOR_CHARGING_ABOVE\fP
+.IP \(bu 2
+\fBLP_COLOR_CHARGING_UNDER\fP
+.IP \(bu 2
+\fBLP_COLOR_DISCHARGING_ABOVE\fP
+.IP \(bu 2
+\fBLP_COLOR_DISCHARGING_UNDER\fP
+.IP \(bu 2
+\fBLP_COLORMAP\fP
+.UNINDENT
+.sp
+And using marks:
+.INDENT 7.0
+.IP \(bu 2
+\fBLP_MARK_ADAPTER\fP
+.IP \(bu 2
+\fBLP_MARK_BATTERY\fP
+.UNINDENT
+.sp
+Adds battery value if \fBLP_PERCENTS_ALWAYS\fP is \fB1\fP\&.
+.sp
+Changed in version 2.0: Return code matches data function.
+Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_dirstack_color() -> var:lp_dirstack_color
+Returns \fB_lp_dirstack()\fP, prefixed with \fBLP_MARK_DIRSTACK\fP, all
+colored with \fBLP_COLOR_DIRSTACK\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_error_color() -> var:lp_error_color
+Returns \fB_lp_error()\fP with color from \fBLP_COLOR_ERR\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_hostname_color() -> var:lp_hostname_color
+Returns \fB_lp_hostname()\fP, with added data from \fB_lp_chroot()\fP\&.
+Color from \fBLP_COLOR_HOST\fP, \fBLP_COLOR_SSH\fP,
+\fBLP_COLOR_HOST_HASH\fP, and \fBLP_COLOR_TELNET\fP, depending on the
+output of \fB_lp_connection()\fP\&.
+.sp
+Added color from \fB_lp_connected_display()\fP: either
+\fBLP_COLOR_X11_ON\fP or \fBLP_COLOR_X11_OFF\fP\&.
+.sp
+Return code is \fB_lp_hostname()\fP ORed with \fB_lp_chroot()\fP: both must
+return no data for \fI\%_lp_hostname_color()\fP to return no data.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_http_proxy_color() -> var:lp_http_proxy_color
+Returns \fB_lp_http_proxy()\fP with color from \fBLP_COLOR_PROXY\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_jobcount_color() -> var:lp_jobcount_color
+Returns \fB_lp_detached_sessions()\fP with color from \fBLP_COLOR_JOB_D\fP
+and \fB_lp_jobcount()\fP with colors from \fBLP_COLOR_JOB_R\fP and
+\fBLP_COLOR_JOB_Z\fP\&.
+.sp
+Return code is \fB_lp_detached_sessions()\fP ORed with \fB_lp_jobcount()\fP:
+both must return no data for \fI\%_lp_jobcount_color()\fP to return no data.
+.sp
+Changed in version 2.0: Return code matches data function.
+Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_load_color() -> var:lp_load_color
+Returns \fB_lp_load()\fP with color from \fBLP_COLORMAP\fP and mark from
+\fBLP_MARK_LOAD\fP\&.
+.sp
+Adds load value if \fBLP_PERCENTS_ALWAYS\fP is \fB1\fP\&.
+.sp
+Changed in version 2.0: Return code matches data function.
+Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_python_env_color() -> var:lp_python_env_color
+Returns \fB_lp_python_env()\fP with color from \fBLP_COLOR_VIRTUALENV\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_runtime_color() -> var:lp_runtime_color
+Returns \fB_lp_runtime_format()\fP with color from \fBLP_COLOR_RUNTIME\fP\&.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_runtime\fP\&.
+Return code matches data function.
+Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_software_collections_color() -> var:lp_software_collections_color
+Returns \fB_lp_software_collections()\fP with color from
+\fBLP_COLOR_VIRTUALENV\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_sudo_active_color() -> var:lp_sudo_active_color
+Returns \fB_lp_sudo_active()\fP with color and marks from
+\fBLP_COLOR_MARK_SUDO\fP if sudo is active, or
+\fBLP_COLOR_MARK_NO_SUDO\fP if not.
+.sp
+Does not return \fB1\fP if sudo is not active, as the return string is still
+needed.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_sudo_check\fP\&.
+Always defined instead of only when \fBLP_ENABLE_SUDO\fP is enabled.
+Return variable changed from \fBLP_COLOR_MARK\fP\&.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_temperature_color() -> var:lp_temperature_color
+Returns \fB_lp_temperature()\fP with color from \fBLP_COLORMAP\fP and mark
+from \fBLP_MARK_TEMP\fP\&.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_temperature\fP\&.
+Return code matches data function.
+Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_time_color() -> var:lp_time_color
+Returns \fB_lp_time()\fP with color from \fBLP_COLOR_TIME\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_vcs_details_color() -> var:lp_vcs_details_color
+Returns data from all generic data/vcs, colored with:
+.INDENT 7.0
+.IP \(bu 2
+\fBLP_COLOR_CHANGES\fP
+.IP \(bu 2
+\fBLP_COLOR_COMMITS\fP
+.IP \(bu 2
+\fBLP_COLOR_COMMITS_BEHIND\fP
+.IP \(bu 2
+\fBLP_COLOR_DIFF\fP
+.IP \(bu 2
+\fBLP_COLOR_UP\fP
+.UNINDENT
+.sp
+And using marks:
+.INDENT 7.0
+.IP \(bu 2
+\fBLP_MARK_STASH\fP
+.IP \(bu 2
+\fBLP_MARK_UNTRACKED\fP
+.UNINDENT
+.sp
+This function should only be called when in a VCS repository; use
+\fB_lp_find_vcs()\fP or \fB_lp_vcs_active()\fP before.
+.sp
+The return code is undefined; a string should always be returned.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SH UTILITY FUNCTIONS
+.sp
+These functions are designed to be used by themes.
+.INDENT 0.0
+.TP
+.B _lp_as_text(string) -> stdout
+Return \fIstring\fP with all shell escaped substrings removed.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_bool(variable[, code])
+Deprecated since version 2.0.
+
+.sp
+Stores the \fIcode\fP in a variable named \fIvariable\fP\&. If \fIcode\fP is not set, uses
+the last return code instead.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_color_map(value, scale=100) -> var:ret
+Returns a color from the configured or default color map based on \fIvalue\fP
+and optional \fIscale\fP\&.
+.sp
+Values below 0 or above \fIscale\fP will be capped.
+.sp
+The returned string is a fully escaped terminal formatting sequence.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_sb(string) -> stdout
+Deprecated since version 2.0: Use the return code of the source data function to determine if any
+string was returned.
+
+.sp
+If \fIstring\fP is set and not empty, returns \fIstring\fP padded with an extra space
+on the right and the left.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_sl(string) -> stdout
+Deprecated since version 2.0: Use the return code of the source data function to determine if any
+string was returned.
+
+.sp
+If \fIstring\fP is set and not empty, returns \fIstring\fP padded with an extra space
+on the left.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_sr(string) -> stdout
+Deprecated since version 2.0: Use the return code of the source data function to determine if any
+string was returned.
+
+.sp
+If \fIstring\fP is set and not empty, returns \fIstring\fP padded with an extra space
+on the right.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_smart_mark([vcs_type]) -> var:lp_smart_mark
+Returns a string set to the configured mark matching \fIvcs_type\fP\&. If
+\fIvcs_type\fP is not set, uses the value of \fBlp_vcs_type\fP instead.
+.sp
+If the type is "git", extra checks are done to see if the repository is of
+type VCSH or git\-svn instead, and return their marks if so.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_title(title) -> stdout
+Deprecated since version 2.0: Use \fI\%_lp_formatted_title\fP instead.
+
+.sp
+Formats \fItitle\fP with title escape codes. The input is escaped using
+\fI\%_lp_as_text()\fP to strip terminal formatting from being added to the
+title. The output should be added to \fBPS1\fP to be printed as a title.
+.sp
+This function will do nothing if \fBLP_ENABLE_TITLE\fP is disabled.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_formatted_title(title)
+Sets the theme generated title to \fItitle\fP\&. The input is escaped using
+\fI\%_lp_as_text()\fP to strip terminal formatting from being added to the
+title.
+.sp
+This function will do nothing and return \fB2\fP if \fBLP_ENABLE_TITLE\fP
+is disabled.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_raw_title(title)
+Sets the theme generated title to \fItitle\fP\&. The input is not escaped in any
+way: if the input contains terminal formatting, use \fI\%_lp_title()\fP
+instead.
+.sp
+This function will do nothing and return \fB2\fP if \fBLP_ENABLE_TITLE\fP
+is disabled.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SH INTERNAL FUNCTIONS
+.INDENT 0.0
+.IP \(bu 2
+\fI\%Config\fP
+.IP \(bu 2
+\fI\%Formatting\fP
+.IP \(bu 2
+\fI\%Git\fP
+.IP \(bu 2
+\fI\%Load\fP
+.IP \(bu 2
+\fI\%OS\fP
+.IP \(bu 2
+\fI\%Path\fP
+.IP \(bu 2
+\fI\%Prompt\fP
+.IP \(bu 2
+\fI\%Runtime\fP
+.IP \(bu 2
+\fI\%Theme\fP
+.IP \(bu 2
+\fI\%Temperature\fP
+.IP \(bu 2
+\fI\%Utility\fP
+.UNINDENT
+.sp
+These functions are designed to be used only by Liquidprompt internals and data
+functions. These functions should not be used by users or themes, as they are
+not guaranteed to be stable between versions. There are documented here for
+information for those developing Liquidprompt.
+.SS Config
+.INDENT 0.0
+.TP
+.B __lp_source_config([\-\-no\-config])
+Load the user config and default config values. This function is called by
+\fBlp_activate()\fP\&.
+.sp
+Also setup color variables that can be used by the user for their color
+config. Those variables are local to this function.
+.sp
+If the \fB\-\-no\-config\fP flag is passed, defaults are set, but no config file
+is sourced.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_source_config\fP\&.
+Added \fB\-\-no\-config\fP flag.
+
+.UNINDENT
+.SS Formatting
+.INDENT 0.0
+.TP
+.B __lp_background_color(color) -> var:ab_color
+Returns the terminal escape code to set the background color to the
+\fI\%ANSI escape color code\fP integer \fIcolor\fP\&. No checking is done for invalid
+color codes.
+.sp
+New in version 1.12.
+
+.sp
+Changed in version 2.0: Renamed from \fBbackground_color\fP\&.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_foreground_color(color) -> var:af_color
+Returns the terminal escape code to set the foreground color to the
+\fI\%ANSI escape color code\fP integer \fIcolor\fP\&. No checking is done for invalid
+color codes.
+.sp
+New in version 1.12.
+
+.sp
+Changed in version 2.0: Renamed from \fBforeground_color\fP\&.
+
+.UNINDENT
+.SS Git
+.INDENT 0.0
+.TP
+.B __lp_git_diff_shortstat_files(diff_shortstat) -> var:lp_git_diff_shortstat_files
+Processes the input \fIdiff_shortstat\fP as the output of a \fBgit diff
+\-\-shortstat\fP command, returning the number of changed files. This allows for
+the comparison of any two states, as \fI\%__lp_git_diff_shortstat_files()\fP
+does not run any specific \fBgit diff\fP command.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_git_diff_shortstat_lines(diff_shortstat) -> var:lp_git_diff_shortstat_lines
+Processes the input \fIdiff_shortstat\fP as the output of a \fBgit diff
+\-\-shortstat\fP command, returning the number of changed lines. This allows for
+the comparison of any two states, as \fI\%__lp_git_diff_shortstat_files()\fP
+does not run any specific \fBgit diff\fP command.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_git_diff_shortstat_staged() -> var:_lp_git_diff_shortstat_staged
+Returns the output of a \fBgit diff \-\-shortstat\fP command, comparing the
+staging area to the HEAD commit.
+.sp
+The return variable is supposed to be a cache, set as local in
+\fI\%__lp_set_prompt()\fP, preventing duplicate calls to \fBgit\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_git_diff_shortstat_uncommitted() -> var:_lp_git_diff_shortstat_uncommitted
+Returns the output of a \fBgit diff \-\-shortstat\fP command, comparing the
+working directory to the HEAD commit.
+.sp
+The return variable is supposed to be a cache, set as local in
+\fI\%__lp_set_prompt()\fP, preventing duplicate calls to \fBgit\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_git_diff_shortstat_unstaged() -> var:_lp_git_diff_shortstat_unstaged
+Returns the output of a \fBgit diff \-\-shortstat\fP command, comparing the
+working directory to the staging area.
+.sp
+The return variable is supposed to be a cache, set as local in
+\fI\%__lp_set_prompt()\fP, preventing duplicate calls to \fBgit\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Load
+.INDENT 0.0
+.TP
+.B __lp_cpu_count() -> var:_lp_CPUNUM
+Returns the number of CPUs on the machine. The implementation depends on the
+operating system.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS OS
+.INDENT 0.0
+.TP
+.B __lp_hostname_hash() -> var:lp_hostname_hash
+Returns the hash of the hostname as computed by \fBcksum\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Path
+.INDENT 0.0
+.TP
+.B __lp_end_path_left_shortening()
+Terminate a multi\-directory shortening, checking if the shortening actually
+made a shorter path, and if so, adding the shortened mark. If not, adds the
+real path to the output. Only used internally by \fB_lp_path_format()\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_get_unique_directory(path) -> var:lp_unique_directory
+Returns the shortest unique directory prefix matching the real directory
+input. Only used internally by \fB_lp_path_format()\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_pwd_tilde([path]) -> var:lp_pwd_tilde
+Returns \fIpath\fP, or \fBPWD\fP if \fIpath\fP is not set, with the user\(aqs home
+directory replaced with a tilde ("~").
+.sp
+Changed in version 2.0: Renamed from \fB_lp_get_home_tilde_collapsed\fP\&.
+Return method changed from stdout.
+Optional parameter \fIpath\fP added.
+
+.UNINDENT
+.SS Prompt
+.INDENT 0.0
+.TP
+.B __lp_set_prompt()
+Setup features that need to be handled outside of the themes, like
+\fB_lp_error()\fP (since last return code must be recorded first), non
+printing features like \fBLP_ENABLE_RUNTIME_BELL\fP and
+\fBLP_ENABLE_TITLE\fP, track current directory changes, and initialize data
+source cache variables. This function also calls the current theme functions.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_set_prompt\fP\&.
+
+.UNINDENT
+.SS Runtime
+.INDENT 0.0
+.TP
+.B __lp_runtime_before()
+Hooks into the shell to run directly after the user hits return on a command,
+to record the current time before the command runs.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_runtime_before\fP\&.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_runtime_after()
+Hooks into the shell to run directly after the user command returns, to
+record the current time, and calculate how long the command ran for.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_runtime_after\fP\&.
+
+.UNINDENT
+.SS Theme
+.INDENT 0.0
+.TP
+.B __lp_theme_list() -> var:lp_theme_list
+Returns an array of Liquidprompt themes currently loaded in memory. Looks for
+functions matching \fB_lp_*_theme_prompt\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_theme_bash_complete() -> var:COMPREPLY
+Uses \fI\%__lp_theme_list()\fP to provide Bash autocompletion for
+\fBlp_theme()\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_theme_zsh_complete()
+Uses \fI\%__lp_theme_list()\fP to provide Zsh autocompletion for
+\fBlp_theme()\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SS Temperature
+.INDENT 0.0
+.TP
+.B __lp_temp_detect() -> var:_LP_TEMP_FUNCTION
+Attempts to run the possible temperature backend functions below to find one
+that works correctly. When one correctly returns a value, it is saved to
+\fB_LP_TEMP_FUNCTION\fP for use by \fB_lp_temperature()\fP\&.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_temp_detect\fP\&.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_temp_acpi() -> var:lp_temperature
+A temperature backend using \fBacpi\fP\&.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_temp_acpi\fP\&.
+Return variable changed from \fBtemperature\fP\&.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_temp_sensors() -> var:lp_temperature
+A temperature backend using lm\-sensors provided \fBsensors\fP\&.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_temp_sensors\fP\&.
+Return variable changed from \fBtemperature\fP\&.
+
+.UNINDENT
+.SS Utility
+.INDENT 0.0
+.TP
+.B __lp_escape(string) -> var:ret
+Escape shell escape characters so they print correctly in \fBPS1\fP\&.
+.sp
+In Bash, backslashes (\fB\e\fP) are used to escape codes, so backslashes are
+replaced by two backslashes.
+.sp
+In Zsh, percents (\fB%\fP) are used to escape codes, so percents are replaced
+by two percents.
+.sp
+Changed in version 2.0: Renamed from \fB_lp_escape\fP\&.
+Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_floating_scale(number, scale) -> var:ret
+Returns the input floating point \fInumber\fP multiplied by the input \fIscale\fP\&.
+The input \fIscale\fP must be a power of 10.
+.sp
+Shells do not support floating point math, so this is used to scale up
+floating point numbers to integers with the needed precision.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_is_function(function)
+Returns \fBtrue\fP if \fIfunction\fP is the name of a function.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_line_count(string) -> var:count
+Count the number of newline characters (\fB\en\fP) in \fIstring\fP\&. A faster drop\-in
+replacement for \fBwc \-l\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.SH COPYRIGHT
+2011-2021, Liquidprompt team
+.\" Generated by docutils manpage writer.
+.

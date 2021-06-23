@@ -1,0 +1,1188 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "LIQUIDPROMPT" "5" "May 30, 2021" "" "Liquidprompt"
+.SH NAME
+liquidprompt \- Liquidprompt configuration
+.INDENT 0.0
+.IP \(bu 2
+\fI\%General\fP
+.IP \(bu 2
+\fI\%Features\fP
+.IP \(bu 2
+\fI\%Thresholds\fP
+.IP \(bu 2
+\fI\%Marks\fP
+.IP \(bu 2
+\fI\%Colors\fP
+.UNINDENT
+.sp
+Almost every feature in Liquidprompt can be turned on or off using these config
+options. They can either be set before sourcing Liquidprompt (in \fB\&.bashrc\fP or
+\fB\&.zshrc\fP), or set in a Liquidprompt config file.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Config variables set in a config file take precedence over variables set in the
+environment or on the command line. Setting a config option on the command
+line, then running \fBlp_activate()\fP will overwrite that option with the
+value from the config file, if it is set there.
+.UNINDENT
+.UNINDENT
+.sp
+The config file is searched for in the following locations:
+.INDENT 0.0
+.IP \(bu 2
+\fB~/.liquidpromptrc\fP
+.IP \(bu 2
+\fB$XDG_CONFIG_HOME/liquidpromptrc\fP \- (if \fBXDG_CONFIG_HOME\fP is not
+set, \fB~/.config\fP is used)
+.IP \(bu 2
+\fB$XDG_CONFIG_DIRS/liquidpromptrc\fP \- \fBXDG_CONFIG_DIRS\fP is a \fB:\fP
+delimited array, each value is searched. (if \fBXDG_CONFIG_DIRS\fP is not
+set, \fB/etc/xdg\fP is used)
+.IP \(bu 2
+\fB/etc/liquidpromptrc\fP
+.UNINDENT
+.sp
+The first file found is sourced.
+.sp
+Liquidprompt ships with an example config file, \fBliquidpromptrc\-dist\fP\&. You can
+start from this file for your config:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+cp ~/liquidprompt/liquidpromptrc\-dist ~/.config/liquidpromptrc
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+In the event that you synchronize your configuration file across multiple
+computers, or if you have an \fB/etc/liquidpromptrc\fP system\-wide from which
+you\(aqd like to make minor deviations in an individual user account, you can
+augment the primary config to add in any local modifications using lines such
+as these:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+LOCAL_RCFILE=$HOME/.liquidpromptrc.local
+[ \-f "$LOCAL_RCFILE" ] && source "$LOCAL_RCFILE"
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+The example config file does not include every config option, and the
+comments describing the options are less verbose than the descriptions on
+this page.
+.UNINDENT
+.UNINDENT
+.sp
+Each config option is documented with its default value.
+Options of type \fBbool\fP accept values of \fB1\fP for true and \fB0\fP for false.
+.SH GENERAL
+.INDENT 0.0
+.TP
+.B LP_MARK_PREFIX: string = " "
+String added directly before \fI\%LP_MARK_DEFAULT\fP, after all other
+parts of the prompt. Can be used to tag the prompt in a way that is less
+intrusive than \fI\%LP_PS1_PREFIX\fP, or add a newline before the prompt
+mark. For example:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+LP_MARK_PREFIX=$\(aq\en\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_PATH_CHARACTER_KEEP: int = 3
+The number of characters to save at the start and possibly the end of a
+directory name when shortening the path. See \fI\%LP_PATH_METHOD\fP for
+details of the specific methods.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_PATH_DEFAULT: string
+Deprecated since version 2.0: Use \fI\%LP_PATH_METHOD\fP set to "truncate_to_last_dir" instead.
+
+.sp
+Used to define the string used for the path. Could be used to make use of
+shell path shortening features, like \fB%2~\fP in Zsh to keep the last two
+directories of the path.
+.sp
+\fI\%LP_ENABLE_SHORTEN_PATH\fP must be disabled to have any effect.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_PATH_KEEP: int = 2
+The number of directories (counting \(aq/\(aq) to display at the beginning of a
+shortened path.
+.sp
+Set to \fB1\fP, will display only root. Set to \fB0\fP, will keep nothing from the
+beginning of the path.
+.sp
+\fI\%LP_ENABLE_SHORTEN_PATH\fP must be enabled to have any effect.
+.sp
+See also: \fI\%LP_PATH_LENGTH\fP and \fI\%LP_PATH_METHOD\fP\&.
+.sp
+Changed in version 2.0: No longer supports a value of \fB\-1\fP\&.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_PATH_LENGTH: int = 35
+The maximum percentage of the terminal width used to display the path before
+removing the center portion of the path and replacing with
+\fI\%LP_MARK_SHORTEN_PATH\fP\&.
+.sp
+\fI\%LP_ENABLE_SHORTEN_PATH\fP must be enabled to have any effect.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+\fI\%LP_PATH_KEEP\fP and \fI\%LP_PATH_METHOD\fP have higher precedence
+over this option. Important path parts, including directories saved by
+\fI\%LP_PATH_KEEP\fP, \fI\%LP_PATH_VCS_ROOT\fP, and the last directory,
+will always be displayed, even if the path does not fit in the maximum
+length.
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_PATH_METHOD: string = "truncate_chars_from_path_left"
+Sets the method used for shortening the path display when it exceeds the
+maximum length set by \fI\%LP_PATH_LENGTH\fP\&.
+.INDENT 7.0
+.IP \(bu 2
+\fBtruncate_chars_from_path_left\fP: Truncates characters from the start of
+the path, showing consecutive directories as one shortened section. E.g. in
+a directory named \fB~/MyProjects/Liquidprompt/tests\fP, it will be shortened
+to \fB\&...prompt/tests\fP\&. The shortened mark is \fI\%LP_MARK_SHORTEN_PATH\fP\&.
+.IP \(bu 2
+\fBtruncate_chars_from_dir_right\fP: Leaves the beginning of a directory name
+untouched. E.g. directories will be shortened like so: \fB~/Doc.../Office\fP\&.
+How many characters will be untouched is set by
+\fI\%LP_PATH_CHARACTER_KEEP\fP\&. The shortened mark is
+\fI\%LP_MARK_SHORTEN_PATH\fP\&.
+.IP \(bu 2
+\fBtruncate_chars_from_dir_middle\fP:  Leaves the beginning and end of a
+directory name untouched. E.g. in a directory named
+\fB~/MyProjects/Office\fP, then it will be shortened to
+\fB~/MyS...cts/Office\fP\&. How many characters will be untouched is set by
+\fI\%LP_PATH_CHARACTER_KEEP\fP\&. The shortened mark is
+\fI\%LP_MARK_SHORTEN_PATH\fP\&.
+.IP \(bu 2
+\fBtruncate_chars_to_unique_dir\fP: Truncate each directory to the shortest
+unique starting portion of their name. E.g. in a folder
+\fB~/dev/liquidprompt\fP, it will be shortened to \fB~/d/liquidprompt\fP if
+there is no other directory starting with \(aqd\(aq in the home directory.
+.IP \(bu 2
+\fBtruncate_to_last_dir\fP: Only display the last directory in the path. In
+other words, the current directory name.
+.UNINDENT
+.sp
+All methods (other than \(aqtruncate_to_last_dir\(aq) start at the far left of the
+path (limited by \fI\%LP_PATH_KEEP\fP). Only the minimum number of
+directories needed to fit inside \fI\%LP_PATH_LENGTH\fP will be shortened.
+.sp
+\fI\%LP_ENABLE_SHORTEN_PATH\fP must be enabled to have any effect.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_PATH_VCS_ROOT: bool = 1
+Display the root directory of the current VCS repository with special
+formatting, set by \fI\%LP_COLOR_PATH_VCS_ROOT\fP\&. If
+\fI\%LP_ENABLE_SHORTEN_PATH\fP is enabled, also prevent the path shortening
+from shortening or hidding the VCS root directory.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_PS1_POSTFIX: string = ""
+A string displayed at the very end of the prompt, after even the prompt mark.
+\fI\%LP_MARK_PREFIX\fP is an alternative that goes before the prompt mark.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_PS1_PREFIX: string = ""
+A string displayed at the start of the prompt. Can also be set with
+\fBprompt_tag()\fP\&.
+.UNINDENT
+.SH FEATURES
+.INDENT 0.0
+.TP
+.B LP_DISABLED_VCS_PATH: string = ""
+Deprecated since version 2.0: Use \fI\%LP_DISABLED_VCS_PATHS\fP instead.
+
+.sp
+An colon (\fB:\fP) separated list of absolute directory paths where VCS
+features will be disabled. See \fI\%LP_DISABLED_VCS_PATHS\fP for more
+information.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_DISABLED_VCS_PATHS: array<string> = ()
+An array of absolute directory paths where VCS features will be disabled.
+Generally this would be used for repositories that are large and slow, where
+generating VCS information for the prompt would impact prompt responsiveness.
+.sp
+Any subdirectory under the input directory is also disabled, so setting
+"/repos" would disable VCS display when the current directory is
+"/repos/a\-repo". Setting \fB("/")\fP would disable VCS display completely.
+.sp
+An example value would be:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+LP_DISABLED_VCS_PATHS=("/a/svn/repo" "/home/me/my/large/repo")
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+See also: \fI\%LP_MARK_DISABLED\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_BATT: bool = 1
+Display the status of the battery, if there is one, using color and marks.
+Add battery percentage colored with \fI\%LP_COLORMAP\fP if
+\fI\%LP_PERCENTS_ALWAYS\fP is enabled.
+.sp
+Will be disabled if \fBacpi\fP is not found on Linux, or \fBpmset\fP is not
+found on MacOS.
+.sp
+See also: \fI\%LP_BATTERY_THRESHOLD\fP, \fI\%LP_MARK_BATTERY\fP,
+\fI\%LP_MARK_ADAPTER\fP, \fI\%LP_COLOR_CHARGING_ABOVE\fP,
+\fI\%LP_COLOR_CHARGING_UNDER\fP, \fI\%LP_COLOR_DISCHARGING_ABOVE\fP, and
+\fI\%LP_COLOR_DISCHARGING_UNDER\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_BZR: bool = 1
+Display VCS information inside \fI\%Bazaar\fP
+repositories.
+.sp
+Will be disabled if \fBbzr\fP is not found.
+.sp
+See also: \fI\%LP_MARK_BZR\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_COLOR: bool = 1
+Use terminal formatting when displaying the prompt.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+Not all formatting is correctly disabled if this option is disabled.
+.UNINDENT
+.UNINDENT
+.sp
+Will be disabled if \fBtput\fP is not found.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_DETACHED_SESSIONS: bool = 1
+Display the number of detached multiplexer sessions.
+.sp
+Will be disabled if neither \fBscreen\fP nor \fBtmux\fP are found.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+This can be slow on some machines, and prompt speed can be greatly
+improved by disabling it.
+.UNINDENT
+.UNINDENT
+.sp
+See also: \fI\%LP_COLOR_JOB_D\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_DIRSTACK: bool = 0
+Display the size of the directory stack if it is greater than \fB1\fP\&.
+.sp
+See also: \fI\%LP_MARK_DIRSTACK\fP and \fI\%LP_COLOR_DIRSTACK\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_ERROR: bool = 1
+Display the last command error code if it is not \fB0\fP\&.
+.sp
+See also: \fI\%LP_COLOR_ERR\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_FOSSIL: bool = 1
+Display VCS information inside \fI\%Fossil\fP
+repositories.
+.sp
+Will be disabled if \fBfossil\fP is not found.
+.sp
+See also: \fI\%LP_MARK_FOSSIL\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_FQDN: bool = 0
+Use the fully qualified domain name (FQDN) instead of the short hostname when
+the hostname is displayed.
+.sp
+See also: \fI\%LP_HOSTNAME_ALWAYS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_GIT: bool = 1
+Display VCS information inside \fI\%Git\fP repositories.
+.sp
+Will be disabled if \fBgit\fP is not found.
+.sp
+See also: \fI\%LP_MARK_GIT\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_HG: bool = 1
+Display VCS information inside \fI\%Mercurial\fP
+repositories.
+.sp
+Will be disabled if \fBhg\fP is not found.
+.sp
+See also: \fI\%LP_MARK_HG\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_JOBS: bool = 1
+Display the number of running and sleeping shell jobs.
+.sp
+See also: \fI\%LP_COLOR_JOB_R\fP and \fI\%LP_COLOR_JOB_Z\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_LOAD: bool = 1
+Display the load average over the past 1 minutes when above the threshold.
+.sp
+See also: \fI\%LP_LOAD_THRESHOLD\fP, \fI\%LP_LOAD_CAP\fP,
+\fI\%LP_MARK_LOAD\fP, \fI\%LP_PERCENTS_ALWAYS\fP, and \fI\%LP_COLORMAP\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_PERM: bool = 1
+Display a colored \fI\%LP_MARK_PERM\fP in the prompt to show when the user
+does not have write permission to the current directory.
+.sp
+See also: \fI\%LP_COLOR_WRITE\fP and \fI\%LP_COLOR_NOWRITE\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_PROXY: bool = 1
+Display a \fI\%LP_MARK_PROXY\fP mark when an HTTP proxy is detected.
+.sp
+See also: \fI\%LP_COLOR_PROXY\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_RUNTIME: bool = 1
+Display runtime of the previous command if over \fI\%LP_RUNTIME_THRESHOLD\fP\&.
+.sp
+See also: \fI\%LP_COLOR_RUNTIME\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_RUNTIME_BELL: bool = 0
+Ring the terminal bell if the previous command ran longer than
+\fI\%LP_RUNTIME_BELL_THRESHOLD\fP\&.
+.sp
+New in version 1.12.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_SCLS: bool = 1
+Display the currently activated \fI\%Red Hat Software Collection\fP\&.
+.sp
+See also: \fI\%LP_COLOR_VIRTUALENV\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_SCREEN_TITLE: bool = 0
+Set the terminal title while in a terminal multiplexer.
+.sp
+\fI\%LP_ENABLE_TITLE\fP must be enabled to have any effect.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_SHORTEN_PATH: bool = 1
+Use the shorten path feature if the path is too long to fit in the prompt
+line.
+.sp
+See also: \fI\%LP_PATH_METHOD\fP, \fI\%LP_PATH_LENGTH\fP,
+\fI\%LP_PATH_KEEP\fP, \fI\%LP_PATH_CHARACTER_KEEP\fP, and
+\fI\%LP_MARK_SHORTEN_PATH\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_SSH_COLORS: bool = 0
+Replace \fI\%LP_COLOR_SSH\fP with a color based on the hash of the hostname.
+This can give each host a "color feel" to help distinguish them.
+.sp
+See also: \fI\%LP_HOSTNAME_ALWAYS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_SUDO: bool = 0
+Check if the user has valid \fBsudo\fP credentials, and display an indicating
+mark or color.
+.sp
+Will be disabled if \fBsudo\fP is not found.
+.sp
+\fBWARNING:\fP
+.INDENT 7.0
+.INDENT 3.5
+Each evocation of \fBsudo\fP by default writes to the syslog, and this will
+run \fBsudo\fP once each prompt. This is likely to make your sysadmin hate
+you.
+.UNINDENT
+.UNINDENT
+.sp
+See also: \fI\%LP_COLOR_MARK_SUDO\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_SVN: bool = 1
+Display VCS information inside \fI\%Subversion\fP
+repositories.
+.sp
+Will be disabled if \fBsvn\fP is not found.
+.sp
+See also: \fI\%LP_MARK_SVN\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_TEMP: bool = 1
+Display the highest system temperature if above the threshold.
+.sp
+Will be disabled if neither \fBsensors\fP nor \fBacpi\fP are found.
+.sp
+See also: \fI\%LP_TEMP_THRESHOLD\fP, \fI\%LP_MARK_TEMP\fP, and
+\fI\%LP_COLORMAP\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_TIME: bool = 0
+Displays the time at which the prompt was shown.
+.sp
+See also: \fI\%LP_TIME_ANALOG\fP and \fI\%LP_COLOR_TIME\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_TITLE: bool = 0
+Set the terminal title to part or all of the prompt string, depending on the
+theme.
+.sp
+Must be enabled to be able to set the manual title with \fBlp_title()\fP\&.
+.sp
+\fBWARNING:\fP
+.INDENT 7.0
+.INDENT 3.5
+This may not work properly on exotic terminals. Please report any issues.
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_VCS_ROOT: bool = 0
+Enable VCS features when running as root. This is disabled by default for
+security.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_ENABLE_VIRTUALENV: bool = 1
+Display the currently activated \fI\%Python\fP or \fI\%Conda\fP virtual environment.
+.sp
+See also: \fI\%LP_COLOR_VIRTUALENV\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_HOSTNAME_ALWAYS: int = 0
+Determine when the hostname should be displayed. Valid values are:
+.INDENT 7.0
+.IP \(bu 2
+\fB0\fP \- show the hostname, except when locally connected
+.IP \(bu 2
+\fB1\fP \- always show the hostname
+.IP \(bu 2
+\fB\-1\fP \- never show the hostname
+.UNINDENT
+.sp
+See also: \fI\%LP_COLOR_HOST\fP and \fI\%LP_ENABLE_SSH_COLORS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_PERCENTS_ALWAYS: bool = 1
+Display the actual values of load and batteries along with their
+corresponding marks. Disable to only print the colored marks.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_TIME_ANALOG: bool = 0
+Shows the time using an analog clock instead of numeric values. The analog
+clock is "accurate" to the nearest half hour. You must have a unicode\-capable
+terminal and a font with the "CLOCK" characters (U+1F550 \- U+1F567).
+.sp
+Will only have an effect if \fI\%LP_ENABLE_TIME\fP is enabled.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_USER_ALWAYS: int = 1
+Determine when the username should be displayed. Valid values are:
+.INDENT 7.0
+.IP \(bu 2
+\fB0\fP \- show the username, except when the user is the login user
+.IP \(bu 2
+\fB1\fP \- always show the username
+.IP \(bu 2
+\fB\-1\fP \- never show the username
+.UNINDENT
+.sp
+See also: \fI\%LP_COLOR_USER_LOGGED\fP, \fI\%LP_COLOR_USER_ALT\fP, and
+\fI\%LP_COLOR_USER_ROOT\fP\&.
+.sp
+Changed in version 2.0: The \fB\-1\fP option was added.
+
+.UNINDENT
+.SH THRESHOLDS
+.INDENT 0.0
+.TP
+.B LP_BATTERY_THRESHOLD: int = 75
+The percentage threshold that the battery level needs to fall below before
+it will be displayed in \fI\%LP_COLOR_CHARGING_UNDER\fP or
+\fI\%LP_COLOR_DISCHARGING_UNDER\fP color. Otherwise, it will be displayed in
+\fI\%LP_COLOR_CHARGING_ABOVE\fP or \fI\%LP_COLOR_DISCHARGING_ABOVE\fP color.
+.sp
+\fI\%LP_ENABLE_BATT\fP must be enabled to have any effect.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_LOAD_CAP: float = 2.0
+The value for load average per CPU to display with the max color scaling.
+Values above this number will still be displayed, but the colors will not
+increase in intensity.
+.sp
+\fI\%LP_ENABLE_LOAD\fP must be enabled to have any effect.
+.sp
+See also: \fI\%LP_COLORMAP\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_LOAD_THRESHOLD: float = 0.60
+Display the load average per CPU when above this threshold. For historical
+reasons, this number must have a decimal point (\(aq.\(aq), or it will be treated
+as a percentage.
+.sp
+\fI\%LP_ENABLE_LOAD\fP must be enabled to have any effect.
+.sp
+Changed in version 2.0: Accepts float values of actual load averages.
+Integer values of centiload are still accepted, but deprecated.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_RUNTIME_THRESHOLD: int = 2
+Time in seconds that a command must run longer than for its runtime to be
+displayed.
+.sp
+\fI\%LP_ENABLE_RUNTIME\fP must be enabled to have any effect.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_RUNTIME_BELL_THRESHOLD: int = 10
+Time in seconds that a command must run longer than for the terminal bell to
+be rung.
+.sp
+\fI\%LP_ENABLE_RUNTIME_BELL\fP must be enabled to have any effect.
+.sp
+New in version 1.12.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_TEMP_THRESHOLD: int = 60
+Display the highest system temperature when the temperature is above this
+threshold (in degrees Celsius).
+.sp
+\fI\%LP_ENABLE_TEMP\fP must be enabled to have any effect.
+.UNINDENT
+.SH MARKS
+.INDENT 0.0
+.TP
+.B LP_MARK_ADAPTER: string = "⏚"
+Mark used for battery display when charging.
+.sp
+See also: \fI\%LP_ENABLE_BATT\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_BATTERY: string = "⌁"
+Mark used for battery display when on battery power.
+.sp
+See also: \fI\%LP_ENABLE_BATT\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_BRACKET_CLOSE: string = "]"
+Mark used for closing core prompt brackets. Used by the default theme for
+enclosing user, host, and current working directory sections.
+.sp
+See also: \fI\%LP_MARK_BRACKET_OPEN\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_BRACKET_OPEN: string = "["
+Mark used for opening core prompt brackets. Used by the default theme for
+enclosing user, host, and current working directory sections.
+.sp
+See also: \fI\%LP_MARK_BRACKET_CLOSE\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_BZR: string = "⚯"
+Mark used instead of \fI\%LP_MARK_DEFAULT\fP to indicate that the current
+directory is inside of a Bazaar repository.
+.sp
+See also: \fI\%LP_ENABLE_BZR\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_DEFAULT: string = "$" (Bash) or "%" (Zsh)
+Mark used to indicate that the prompt is ready for user input, unless some
+other context overrides it, like a VCS repository.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_DIRSTACK: string = "⚞"
+Mark used to indicate the size of the directory stack. Here are some
+alternative marks you might like: ⚟ = ≡ ≣
+.sp
+See also: \fI\%LP_ENABLE_DIRSTACK\fP and \fI\%LP_COLOR_DIRSTACK\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_DISABLED: string = "⌀"
+Mark used instead of \fI\%LP_MARK_DEFAULT\fP to indicate that the current
+directory is disabled for VCS display through \fI\%LP_DISABLED_VCS_PATHS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_FOSSIL: string = "⌘"
+Mark used instead of \fI\%LP_MARK_DEFAULT\fP to indicate that the current
+directory is inside of a Fossil repository.
+.sp
+See also: \fI\%LP_ENABLE_FOSSIL\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_GIT: string = "±"
+Mark used instead of \fI\%LP_MARK_DEFAULT\fP to indicate that the current
+directory is inside of a Git repository.
+.sp
+See also: \fI\%LP_ENABLE_GIT\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_HG: string = "☿"
+Mark used instead of \fI\%LP_MARK_DEFAULT\fP to indicate that the current
+directory is inside of a Mercurial repository.
+.sp
+See also: \fI\%LP_ENABLE_HG\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_LOAD: string = "⌂"
+Mark used before displaying load average.
+.sp
+See also: \fI\%LP_ENABLE_LOAD\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_PERM: string = ":"
+Mark used by default separate hostname and current working directory, and is
+colored to indicate user permissions on the current directory.
+.sp
+Is still used (without colors) if \fI\%LP_ENABLE_PERM\fP is disabled.
+.sp
+New in version 1.12.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_PROXY: string = "↥"
+Mark used to indicate a proxy is active.
+.sp
+See also: \fI\%LP_ENABLE_PROXY\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_SHORTEN_PATH: string = " … "
+Mark used to indicate a portion of the path was hidden to save space. Not all
+shortening methods use this mark, some only use
+\fI\%LP_COLOR_PATH_SHORTENED\fP\&.
+.sp
+See also: \fI\%LP_ENABLE_SHORTEN_PATH\fP, \fI\%LP_PATH_METHOD\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_STASH: string = "+"
+Mark used to indicate at least one stash or shelve exists in the current
+repository.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_SVN: string = "‡"
+Mark used instead of \fI\%LP_MARK_DEFAULT\fP to indicate that the current
+directory is inside of a Subversion repository.
+.sp
+See also: \fI\%LP_ENABLE_SVN\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_TEMP: string = "θ"
+Mark used before displaying temperature.
+.sp
+See also: \fI\%LP_ENABLE_TEMP\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_UNTRACKED: string = "*"
+Mark used to indicate untracked or extra files exist in the current
+repository.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_MARK_VCSH: string = "|"
+Mark used instead of \fI\%LP_MARK_DEFAULT\fP to indicate that the current
+directory is inside of a \fI\%VCSH\fP repository.
+.sp
+Since VCSH repositories are Git repositories under the hood,
+\fI\%LP_MARK_GIT\fP is surrounded in this mark.
+.UNINDENT
+.SH COLORS
+.sp
+These color strings will be used without modification, so they need to be valid
+terminal escape sequences, either generated with \fBlp_terminal_format()\fP or
+using the \fB$COLOR\fP variables.
+.sp
+Valid preset color variables are:
+.INDENT 0.0
+.IP \(bu 2
+\fBBOLD\fP \- bold formatting only.
+.IP \(bu 2
+\fBBLACK\fP
+.IP \(bu 2
+\fBBOLD_GRAY\fP \- actually bold black
+.IP \(bu 2
+\fBRED\fP
+.IP \(bu 2
+\fBBOLD_RED\fP
+.IP \(bu 2
+\fBGREEN\fP
+.IP \(bu 2
+\fBBOLD_GREEN\fP
+.IP \(bu 2
+\fBYELLOW\fP
+.IP \(bu 2
+\fBBOLD_YELLOW\fP
+.IP \(bu 2
+\fBBLUE\fP
+.IP \(bu 2
+\fBBOLD_BLUE\fP
+.IP \(bu 2
+\fBPURPLE\fP or \fBMAGENTA\fP
+.IP \(bu 2
+\fBBOLD_PURPLE\fP, \fBBOLD_MAGENTA\fP or \fBPINK\fP
+.IP \(bu 2
+\fBCYAN\fP
+.IP \(bu 2
+\fBBOLD_CYAN\fP
+.IP \(bu 2
+\fBWHITE\fP
+.IP \(bu 2
+\fBBOLD_WHITE\fP
+.IP \(bu 2
+\fBWARN_RED\fP \- black foreground, red background
+.IP \(bu 2
+\fBCRIT_RED\fP \- white foreground, red background
+.IP \(bu 2
+\fBDANGER_RED\fP \- yellow foreground, red background
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLORMAP: array<string>
+An array of colors that is used by the battery, load, and temperature
+features to indicate the severity level of their status. A normal or low
+status will use the first index, while the last index is the most severe.
+.sp
+The default array is:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+(
+    ""
+    $GREEN
+    $BOLD_GREEN
+    $YELLOW
+    $BOLD_YELLOW
+    $RED
+    $BOLD_RED
+    $WARN_RED
+    $CRIT_RED
+    $DANGER_RED
+)
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+See also: \fI\%LP_ENABLE_BATT\fP, \fI\%LP_ENABLE_LOAD\fP, and
+\fI\%LP_ENABLE_TEMP\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_CHANGES: string = $RED
+Color used to indicate that the current repository is not clean, or in other
+words, has changes that have not been committed.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_CHARGING_ABOVE: string = $GREEN
+Color used to indicate that the battery is charging and above the
+\fI\%LP_BATTERY_THRESHOLD\fP\&.
+.sp
+See also: \fI\%LP_ENABLE_BATT\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_CHARGING_UNDER: string = $YELLOW
+Color used to indicate that the battery is charging and under the
+\fI\%LP_BATTERY_THRESHOLD\fP\&.
+.sp
+See also: \fI\%LP_ENABLE_BATT\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_COMMITS_BEHIND: string = $BOLD_RED
+Color used to indicate that the current repository has a remote tracking
+branch that has commits that the local branch does not.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_COMMITS: string = $YELLOW
+Color used to indicate that the current repository has commits on the local
+branch that the remote tracking branch does not.
+.sp
+Also used to color \fI\%LP_MARK_STASH\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_DIFF: string = $PURPLE
+Color used to indicate that the current repository has lines that have been
+changed since the last commit.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_DIRSTACK: string = $BOLD_YELLOW
+Color used to indicate the size of the directory stack.
+.sp
+See also: \fI\%LP_ENABLE_DIRSTACK\fP and \fI\%LP_MARK_DIRSTACK\fP\&.
+.sp
+New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_DISCHARGING_ABOVE: string = $YELLOW
+Color used to indicate that the battery is discharging and above the
+\fI\%LP_BATTERY_THRESHOLD\fP\&.
+.sp
+See also: \fI\%LP_ENABLE_BATT\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_DISCHARGING_UNDER: string = $RED
+Color used to indicate that the battery is discharging and above the
+\fI\%LP_BATTERY_THRESHOLD\fP\&.
+.sp
+See also: \fI\%LP_ENABLE_BATT\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_ERR: string = $PURPLE
+Color used to indicate the last command exited with a non\-zero return code.
+.sp
+See also: \fI\%LP_ENABLE_ERROR\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_HOST: string = ""
+Color used for the hostname when connected locally.
+.sp
+See also: \fI\%LP_HOSTNAME_ALWAYS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_IN_MULTIPLEXER: string = $BOLD_BLUE
+Color used for \fI\%LP_MARK_BRACKET_OPEN\fP and \fI\%LP_MARK_BRACKET_CLOSE\fP
+if the terminal is in a multiplexer.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_JOB_D: string = $YELLOW
+Color used for detached multiplexer sessions.
+.sp
+See also: \fI\%LP_ENABLE_DETACHED_SESSIONS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_JOB_R: string = $BOLD_YELLOW
+Color used for running shell jobs.
+.sp
+See also: \fI\%LP_ENABLE_JOBS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_JOB_Z: string = $BOLD_YELLOW
+Color used for sleeping shell jobs.
+.sp
+See also: \fI\%LP_ENABLE_JOBS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_MARK: string = $BOLD
+Color used for \fI\%LP_MARK_DEFAULT\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_MARK_ROOT: string = $BOLD_RED
+Color used for \fI\%LP_MARK_DEFAULT\fP when the current user is root, shown
+instead of \fI\%LP_COLOR_MARK\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_MARK_SUDO: string = $LP_COLOR_MARK_ROOT
+Color used for \fI\%LP_MARK_DEFAULT\fP when sudo is active, shown instead of
+\fI\%LP_COLOR_MARK\fP\&.
+.sp
+See also: \fI\%LP_ENABLE_SUDO\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_NOWRITE: string = $RED
+Color used for \fI\%LP_MARK_PERM\fP when the user does not have write
+permissions to the current working directory.
+.sp
+See also: \fI\%LP_ENABLE_PERM\fP and \fI\%LP_COLOR_WRITE\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_PATH: string = ""
+Color used for the current working directory.
+.sp
+If \fI\%LP_COLOR_PATH_LAST_DIR\fP, \fI\%LP_COLOR_PATH_VCS_ROOT\fP,
+\fI\%LP_COLOR_PATH_SEPARATOR\fP, or \fI\%LP_COLOR_PATH_SHORTENED\fP are set,
+their respective sections will be colored with them instead.
+.sp
+Changed in version 2.0: Default value changed from \fB$BOLD\fP to the default color.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_PATH_LAST_DIR: string = $BOLD
+Color used for the last path segment, which corresponds to the current
+directory basename.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_PATH_ROOT: string = $BOLD_YELLOW
+Color used in place of \fI\%LP_COLOR_PATH\fP when the current user is root.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_PATH_SEPARATOR: string = lp_terminal_format 8 \-1 0 0 \-1  # Grey
+Color used for the separator (\(aq/\(aq) between path segments. If set to the empty
+string, the separator will take the format of the path segment before it.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_PATH_SHORTENED: string = lp_terminal_format 8 \-1 0 0 \-1  # Grey
+Color used for path segments that have been shortened.
+.sp
+\fI\%LP_ENABLE_SHORTEN_PATH\fP must be enabled to have any effect.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_PATH_VCS_ROOT: string = $BOLD
+Color used for the path segment corresponding to the current VCS repository
+root directory.
+.sp
+\fI\%LP_PATH_VCS_ROOT\fP must be enabled to have any effect.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_PROXY: string = $BOLD_BLUE
+Color used for \fI\%LP_MARK_PROXY\fP\&.
+.sp
+See also: \fI\%LP_ENABLE_PROXY\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_RUNTIME: string = $YELLOW
+Color used for displaying the last command runtime.
+.sp
+See also: \fI\%LP_ENABLE_RUNTIME\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_SSH: string = $BLUE
+Color used for displaying the hostname when connected with SSH.
+.sp
+Has no effect if \fI\%LP_ENABLE_SSH_COLORS\fP is enabled.
+.sp
+See also: \fI\%LP_HOSTNAME_ALWAYS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_SU: string = $BOLD_YELLOW
+Color used for displaying the hostname when running under \fBsu\fP or \fBsudo\fP\&.
+.sp
+See also: \fI\%LP_HOSTNAME_ALWAYS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_TELNET: string = $WARN_RED
+Color used for displaying the hostname when connected with Telnet.
+.sp
+See also: \fI\%LP_HOSTNAME_ALWAYS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_TIME: string = $BLUE
+Color used for displaying the current time.
+.sp
+See also: \fI\%LP_ENABLE_TIME\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_UP: string = $GREEN
+Color used to indicate that the current repository is up\-to\-date and no
+commits differ from the remote tracking branch.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_USER_ALT: string = $BOLD
+Color used for displaying the username when running as a different user than
+the login user.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_USER_LOGGED: string = ""
+Color used for displaying the username when running as the login user.
+.sp
+See also: \fI\%LP_USER_ALWAYS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_USER_ROOT: string = $BOLD_YELLOW
+Color used for displaying the username when running as root.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_VIRTUALENV: string = $CYAN
+Color used for displaying a Python virtual env or Red Hat Software
+Collection.
+.sp
+See also: \fI\%LP_ENABLE_VIRTUALENV\fP and \fI\%LP_ENABLE_SCLS\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_WRITE: string = $GREEN
+Color used for \fI\%LP_MARK_PERM\fP when the user has write permissions to
+the current working directory.
+.sp
+See also: \fI\%LP_ENABLE_PERM\fP and \fI\%LP_COLOR_NOWRITE\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_X11_OFF: string = $YELLOW
+Color used for indicating that a display is not connected.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_COLOR_X11_ON: string = $GREEN
+Color used for indicating that a display is connected.
+.UNINDENT
+.SH COPYRIGHT
+2011-2021, Liquidprompt team
+.\" Generated by docutils manpage writer.
+.
