@@ -153,6 +153,10 @@ LP_ENABLE_SSH_COLORS=1
 
 # Specify a list of complete and colon (":") separated paths in which, all vcs
 # will be disabled
-LP_DISABLED_VCS_PATH=""
+if [ "$(hostname)" = "suyin-arch" ]; then
+    LP_DISABLED_VCS_PATH="$HOME/Bulk/rust:$(realpath "$HOME/Bulk/rust")"
+else
+    LP_DISABLED_VCS_PATH=""
+fi
 
 # vim: set et sts=4 sw=4 tw=120 ft=sh:
