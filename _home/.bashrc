@@ -22,7 +22,7 @@ alias egrep='egrep --color=auto'
 [[ $- = *i* ]] && source ~/.liquidprompt/liquidprompt
 
 # set gopath
-if [[ $(cat /etc/hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
 	export GOPATH=$HOME/.cache/go
 	export PATH=$PATH:/usr/lib/go-1.6/bin:$GOPATH/bin
 	# [2020-05-08] Fix for being able to compile the Go standard library.
@@ -33,17 +33,17 @@ fi
 export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH
 
 # set password store directory
-if [[ $(cat /etc/hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
 	export PASSWORD_STORE_DIR=~/Documents/Vault/password-store
 fi
 
 # add an alias for starting factorio
-if [[ $(cat /etc/hostname) == aang ]]; then
+if [[ $(hostname 2>/dev/null) == aang ]]; then
 	alias factorio="firejail \$HOME/Games/Factorio/bin/x64/factorio"
 fi
 
 # use keychain if we're on aang/suyin-arch and we are logged in via SSH
-if [[ $(cat /etc/hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
 	if [ -n "$SSH_CONNECTION" ]; then
 		eval "$(keychain --eval --quiet)"
 	fi
@@ -57,7 +57,7 @@ function rg()
 
 # preferred editor, pager on suyin-arch is vim, "bat --plain"
 # add an alias for starting factorio
-if [[ $(cat /etc/hostname) == suyin-arch ]]; then
+if [[ $(hostname 2>/dev/null) == suyin-arch ]]; then
 	export EDITOR="vim"
 	export PAGER="less"
 fi
@@ -68,6 +68,6 @@ if type bat >/dev/null 2>/dev/null; then
 fi
 
 # add devkitpro tools to path
-if [[ $(cat /etc/hostname) == suyin-arch ]]; then
+if [[ $(hostname 2>/dev/null) == suyin-arch ]]; then
 	PATH="$PATH:/opt/devkitpro/devkitARM/bin:/opt/devkitpro/tools/bin"
 fi
