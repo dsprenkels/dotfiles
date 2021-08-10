@@ -1,9 +1,12 @@
 #!/bin/bash
 
+suki="suki"
+helikon="helikon"
 subvolumes=("/home" "/etc" "/var" "/usr/local")
-hostname="$(hostname)"
+hostname="$(hostname)"	
 
 if [[ "$(hostname)" == "suyin-arch" ]]; then
+	helikon="helikon.local"
 	subvolumes=("/home/daan" "/etc" "/var" "/usr/local")
 fi
 
@@ -26,8 +29,8 @@ mbsync --all
 
 echo >&2 "Performing backups"
 for dir in "Documents" "Pictures" "Videos" "Music" "Games" "Zotero" ".factorio" ".config"; do
-	rsync -ravuzzh --delete "$(realpath "/home/daan/${dir}")/" "suki:/volume1/backup_slave/${hostname}/${dir}/"
-	rsync -ravuzh --delete "$(realpath "/home/daan/${dir}")/" "helikon:\$HOME/katarastorage/private/backup/${hostname}_backup/${dir}/"
+	rsync -ravuzzh --delete "$(realpath "/home/daan/${dir}")/" "$suki:/volume1/backup_slave/${hostname}/${dir}/"
+	rsync -ravuzh --delete "$(realpath "/home/daan/${dir}")/" "$helikon:\$HOME/katarastorage/private/backup/${hostname}_backup/${dir}/"
 done
 
 exit 0
