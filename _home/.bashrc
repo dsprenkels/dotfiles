@@ -23,14 +23,19 @@ alias egrep='egrep --color=auto'
 
 # set gopath
 if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
-	export GOPATH=$HOME/.cache/go
-	export PATH=$PATH:/usr/lib/go-1.6/bin:$GOPATH/bin
+	export GOPATH="$HOME/.cache/go"
+	export PATH="$PATH:/usr/lib/go-1.6/bin:$GOPATH/bin"
 	# [2020-05-08] Fix for being able to compile the Go standard library.
 	export GOROOT=
 fi
 
+# set ruby path
+if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
+	export PATH="$PATH:/home/daan/.gem/ruby/3.0.0/bin"
+fi
+
 # set additional local search path
-export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 # set password store directory
 if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
