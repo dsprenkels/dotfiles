@@ -2,7 +2,8 @@
 
 set -eu
 
-readonly AUTORCDIR="$(realpath "$(dirname "$0")/_home")"
+readonly AUTORCDIR
+AUTORCDIR="$(realpath "$(dirname "$0")/_home")"
 
 if [ -z "${HOST+x}" ]
 then
