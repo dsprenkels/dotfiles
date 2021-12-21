@@ -2,7 +2,7 @@
 
 set -eu
 
-readonly AUTORCDIR
+export AUTORCDIR
 AUTORCDIR="$(realpath "$(dirname "$0")/_home")"
 
 if [ -z "${HOST+x}" ]
