@@ -12,8 +12,8 @@ while [[ $randdir == '' || $randdir == */* || $randdir == *-* ]]; do
 done
 ssh "$hostname" "mkdir \"filedrop/$randdir\""
 for file in "$@"; do
-    unspaced="${file// /_}"
-    scp "$file" "$hostname:filedrop/$randdir/$unspaced"
-    ssh "$hostname" "chmod a+r \"filedrop/$randdir/$unspaced\""
-    echo >&2 "https://ds7s.nl/filedrop/$randdir/$(basename "$unspaced")"
+    stubname="$(echo "${file// /_}" | tr -cd '[:alnum:]\\/._-')"
+    scp "$file" "$hostname:filedrop/$randdir/$stubname"
+    ssh "$hostname" "chmod a+r \"filedrop/$randdir/$stubname\""
+    echo >&2 "https://ds7s.nl/filedrop/$randdir/$(basename "$stubname")"
 done
