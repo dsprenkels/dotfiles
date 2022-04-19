@@ -32,7 +32,7 @@ for dir in "Documents" ".config"; do
 	rsync -ravuzzh --delete "$(realpath "/home/daan/${dir}")/" "$suki:/volume1/backup_slave/${hostname}/${dir}/"
 done
 for dir in "Documents" "Pictures" "Videos" "Games" ".factorio" ".config"; do
-	rsync -ravuzh --delete "$(realpath "/home/daan/${dir}")/" "$helikon:\$HOME/katarastorage/private/backup/${hostname}_backup/${dir}/"
+	rsync -ravuzh --delete "$(realpath "/home/daan/${dir}")/" "$helikon:/volume1/homes/daan/katarastorage/private/backup/${hostname}_backup/${dir}/"
 done
 
 exit 0
