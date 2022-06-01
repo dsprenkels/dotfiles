@@ -76,3 +76,7 @@ fi
 if [[ $(hostname 2>/dev/null) == suyin-arch ]]; then
 	PATH="$PATH:/opt/devkitpro/devkitARM/bin:/opt/devkitpro/tools/bin"
 fi
+
+if [[ $(hostname 2>/dev/null) == shaggydog ]]; then
+	LD_LIBRARY_PATH="$HOME/jasmin-dilithium/dilithium/ref:$LD_LIBRARY_PATH"
+fi

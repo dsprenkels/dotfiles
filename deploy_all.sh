@@ -10,3 +10,4 @@ HOST=jet ./deploy.sh
 # HOST=ghost ./deploy.sh
 # HOST=sandor ./deploy.sh
 # HOST=lilo ./deploy.sh
+# HOST=shaggydog ./deploy.sh
