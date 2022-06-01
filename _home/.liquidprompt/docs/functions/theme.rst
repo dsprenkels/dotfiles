@@ -90,6 +90,12 @@ specific text and formatting may change.
 
    .. versionadded:: 2.0
 
+.. function:: _lp_aws_profile_color() -> var:lp_aws_profile_color
+
+   Returns :func:`_lp_aws_profile` with color from :attr:`LP_COLOR_AWS_PROFILE`.
+
+   .. versionadded:: 2.1
+
 .. function:: _lp_battery_color() -> var:lp_battery_color
 
    Returns data from :func:`_lp_battery`, colored with:
@@ -110,6 +116,14 @@ specific text and formatting may change.
    .. versionchanged:: 2.0
       Return code matches data function.
       Return method changed from stdout.
+
+.. function:: _lp_container_color() -> var:_lp_container_color
+
+    Returns :func:`_lp_container`, surrounded by « and »
+    colored with :attr:`LP_COLOR_CONTAINER` if the value is true.
+    Returns no data if the value is false.
+
+    .. versionadded:: 2.1
 
 .. function:: _lp_dirstack_color() -> var:lp_dirstack_color
 
@@ -158,6 +172,13 @@ specific text and formatting may change.
       Return code matches data function.
       Return method changed from stdout.
 
+.. function:: _lp_kubernetes_context_color() -> var:lp_kubernetes_context_color
+
+   Returns data from :func:`_lp_kubernetes_context`, colored with
+   :attr:`LP_COLOR_KUBECONTEXT` and using mark :attr:`LP_MARK_KUBECONTEXT`.
+
+   .. versionadded:: 2.1
+
 .. function:: _lp_load_color() -> var:lp_load_color
 
    Returns :func:`_lp_load` with color from :attr:`LP_COLORMAP` and mark from
@@ -169,11 +190,23 @@ specific text and formatting may change.
       Return code matches data function.
       Return method changed from stdout.
 
+.. function:: _lp_node_env_color() -> var:lp_node_env_color
+
+   Returns :func:`_lp_node_env` with color from :attr:`LP_COLOR_NODE_VENV`.
+
+   .. versionadded:: 2.1
+
 .. function:: _lp_python_env_color() -> var:lp_python_env_color
 
    Returns :func:`_lp_python_env` with color from :attr:`LP_COLOR_VIRTUALENV`.
 
    .. versionadded:: 2.0
+
+.. function:: _lp_ruby_env_color() -> var:lp_ruby_env_color
+
+   Returns :func:`_lp_ruby_env` with color from :attr:`LP_COLOR_RUBY_VENV`.
+
+   .. versionadded:: 2.1
 
 .. function:: _lp_runtime_color() -> var:lp_runtime_color
 
@@ -183,6 +216,13 @@ specific text and formatting may change.
       Renamed from ``_lp_runtime``.
       Return code matches data function.
       Return method changed from stdout.
+
+.. function:: _lp_shell_level_color() -> var:lp_shell_level_color
+
+    Returns :func:`_lp_shell_level`, prefixed with :attr:`LP_MARK_SHLVL`, all
+    colored with :attr:`LP_COLOR_SHLVL`.
+
+    .. versionadded:: 2.1
 
 .. function:: _lp_software_collections_color() -> var:lp_software_collections_color
 
@@ -215,6 +255,12 @@ specific text and formatting may change.
       Return code matches data function.
       Return method changed from stdout.
 
+.. function:: _lp_terraform_env_color() -> var:lp_terraform_env_color
+
+   Returns :func:`_lp_terraform_env` with color from :attr:`LP_COLOR_TERRAFORM`.
+
+   .. versionadded:: 2.1
+
 .. function:: _lp_time_color() -> var:lp_time_color
 
    Returns :func:`_lp_time` with color from :attr:`LP_COLOR_TIME`.
@@ -242,3 +288,10 @@ specific text and formatting may change.
    The return code is undefined; a string should always be returned.
 
    .. versionadded:: 2.0
+
+.. function:: _lp_wifi_signal_strength_color() -> var:lp_wifi_signal_strength_color
+
+   Returns :func:`_lp_wifi_signal_strength` with color from :attr:`LP_COLORMAP`
+   and mark from :attr:`LP_MARK_WIFI`.
+
+   .. versionadded:: 2.1

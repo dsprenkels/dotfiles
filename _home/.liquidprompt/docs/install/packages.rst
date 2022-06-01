@@ -34,13 +34,13 @@ Debian
 
 ... and Debian derivatives.
 
-.. image:: https://repology.org/badge/version-for-repo/debian_stable/liquidprompt.svg
-   :alt: Debian Stable package
-   :target: https://packages.debian.org/stable/source/liquidprompt
+.. image:: https://repology.org/badge/version-for-repo/debian_unstable/liquidprompt.svg
+   :alt: Debian Unstable package
+   :target: https://packages.debian.org/source/liquidprompt
 
-.. image:: https://repology.org/badge/version-for-repo/ubuntu_20_10/liquidprompt.svg
-   :alt: Ubuntu 20.10 package
-   :target: https://packages.ubuntu.com/source/groovy/liquidprompt
+.. image:: https://repology.org/badge/version-for-repo/ubuntu_22_04/liquidprompt.svg
+   :alt: Ubuntu 22.04 package
+   :target: https://packages.ubuntu.com/source/liquidprompt
 
 .. image:: https://repology.org/badge/version-for-repo/mx_19_testing/liquidprompt.svg
    :alt: MX Linux MX-19 Testing package

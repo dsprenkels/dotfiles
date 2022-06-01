@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "LIQUIDPROMPT" "7" "May 30, 2021" "" "Liquidprompt"
+.TH "LIQUIDPROMPT" "7" "May 27, 2022" "" "Liquidprompt"
 .SH NAME
 liquidprompt \- Liquidprompt theming
 .sp
@@ -49,7 +49,7 @@ If you want to create your own theme, see theme/custom\&.
 .IP \(bu 2
 \fI\%Preview\fP
 .IP \(bu 2
-\fI\%Configuation\fP
+\fI\%Configuration\fP
 .IP \(bu 2
 \fI\%Templates\fP
 .INDENT 2.0
@@ -75,18 +75,18 @@ like this:
 [image]
 .sp
 See \fI\%Templates\fP for what each section will look like.
-.SS Configuation
+.SS Configuration
 .sp
 As the default theme, all of the normal \&../config are respected.
 .INDENT 0.0
 .TP
-.B LP_PS1_FILE: string = ""
+.B LP_PS1_FILE:  string  =  ""
 A template file that is sourced for each prompt. Must set \fI\%LP_PS1\fP\&.
 See \fI\%Templates\fP for details.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B LP_PS1: string = ""
+.B LP_PS1:  string  =  ""
 If set, the default theme sets \fBPS1\fP to this value. Not very useful
 to set it in the config, instead set it in the \fI\%LP_PS1_FILE\fP\&.
 .UNINDENT
@@ -171,6 +171,15 @@ intensity color map as temperature increases. See \fBLP_ENABLE_TEMP\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
+.B LP_WIFI
+The lowest wireless signal strength, displayed with an intensity color map as
+strength decreases. See \fBLP_ENABLE_WIFI_STRENGTH\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
 .B LP_JOBS
 The number of detached sessions. See \fBLP_ENABLE_DETACHED_SESSIONS\fP\&.
 .sp
@@ -219,6 +228,9 @@ See \fBLP_ENABLE_SHORTEN_PATH\fP\&.
 The size of the directory stack, prefixed with \fBLP_MARK_DIRSTACK\fP, all
 colored with \fBLP_COLOR_DIRSTACK\fP\&. Can be enabled by
 \fBLP_ENABLE_DIRSTACK\fP\&.
+.sp
+New in version 2.0.
+
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -231,15 +243,74 @@ If running in a terminal multiplexer, will be colored. See
 .UNINDENT
 .INDENT 0.0
 .TP
+.B LP_SHLVL
+The number of nested shells, prefixed with \fBLP_MARK_SHLVL\fP, all colored
+with \fBLP_COLOR_SHLVL\fP\&. Can be disabled by attr:\fILP_ENABLE_SHLVL\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
 .B LP_SCLS
 The current Red Hat Software Collections environment. See
 \fBLP_ENABLE_SCLS\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
+.B LP_AWS_PROFILE
+The current active AWS Profile. See
+\fBLP_ENABLE_AWS_PROFILE\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_CONTAINER
+The container status for the current shell. See \fBLP_ENABLE_CONTAINER\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
 .B LP_VENV
 The current Python (or Conda) virtual environment. See
 \fBLP_ENABLE_VIRTUALENV\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_NODE_VENV
+The current Node.js virtual environment. See \fBLP_ENABLE_NODE_VENV\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_RUBY_VENV
+The current Ruby virtual environment. See \fBLP_ENABLE_RUBY_VENV\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_TFSPACE
+The current Terraform workspace. See \fBLP_ENABLE_TERRAFORM\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B LP_KUBECONTEXT
+The current Kubernetes context. See
+\fBLP_ENABLE_KUBECONTEXT\fP\&.
+.sp
+New in version 2.1.
+
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -414,7 +485,7 @@ Alternate VCS adds these config options:
 .SS Features
 .INDENT 0.0
 .TP
-.B LP_ALWAYS_ALT_VCS_TAG: bool = 0
+.B LP_ALWAYS_ALT_VCS_TAG:  bool  =  0
 Determine when a matching VCS tag should be displayed:
 .INDENT 7.0
 .IP \(bu 2
@@ -425,17 +496,17 @@ Determine when a matching VCS tag should be displayed:
 .UNINDENT
 .INDENT 0.0
 .TP
-.B LP_ENABLE_ALT_VCS_COMMITS: bool = 1
+.B LP_ENABLE_ALT_VCS_COMMITS:  bool  =  1
 Display commits ahead or behind the remote tracking branch.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B LP_ENABLE_ALT_VCS_DIFF: bool = 1
+.B LP_ENABLE_ALT_VCS_DIFF:  bool  =  1
 Display the number of changed lines.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B LP_ENABLE_ALT_VCS_STATUS: bool = 1
+.B LP_ENABLE_ALT_VCS_STATUS:  bool  =  1
 Display the number(s) of changed files, of type staged (if VCS supports
 staging), non\-staged (or non\-committed if no staging), and untracked.
 .sp
@@ -445,7 +516,7 @@ there are untracked files (the behavior of the default theme).
 .SS Markers
 .INDENT 0.0
 .TP
-.B LP_MARK_ALT_VCS_TAG: string = "🔖"
+.B LP_MARK_ALT_VCS_TAG:  string  =  "🔖"
 The marker string used to indicate the following string is a VCS tag.
 .UNINDENT
 .SS Powerline Theme
@@ -460,7 +531,7 @@ The included \fBthemes/powerline/powerline.theme\fP file includes two themes:
 .IP \(bu 2
 \fI\%Setup\fP
 .IP \(bu 2
-\fI\%Configuation\fP
+\fI\%Configuration\fP
 .INDENT 2.0
 .IP \(bu 2
 \fI\%Liquidprompt Configuration\fP
@@ -482,7 +553,7 @@ The included \fBthemes/powerline/powerline.theme\fP file includes two themes:
 .IP \(bu 2
 \fI\%Setup\fP
 .IP \(bu 2
-\fI\%Configuation\fP
+\fI\%Configuration\fP
 .INDENT 2.0
 .IP \(bu 2
 \fI\%Liquidprompt Configuration\fP
@@ -540,7 +611,7 @@ You will either need a compatible font, or to configure the dividers and markers
 to use other characters.
 .sp
 See the \fI\%Powerline Fonts installation docs\fP for help.
-.SS Configuation
+.SS Configuration
 .SS Liquidprompt Configuration
 .sp
 The following Liquidprompt config options are respected:
@@ -600,36 +671,36 @@ Powerline adds these config options:
 .SS Markers
 .INDENT 0.0
 .TP
-.B POWERLINE_HARD_DIVIDER: string = ""  # U+E0B0
+.B POWERLINE_HARD_DIVIDER:  string  =  ""  # U+E0B0
 The divider character between sections, defaults to the private character
 used in Powerline fonts that looks like a solid right arrow.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_PYTHON_ENV_MARKER: string = "(e) "
+.B POWERLINE_PYTHON_ENV_MARKER:  string  =  "(e) "
 The marker string used to indicate the following string is a Python
 environment.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_ROOT_MARKER: string = "#"
+.B POWERLINE_ROOT_MARKER:  string  =  "#"
 The marker character used to indicate a root session.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_SECURE_MARKER: string = ""  # U+E0A2
+.B POWERLINE_SECURE_MARKER:  string  =  ""  # U+E0A2
 The marker character used to indicate a SSH session, defaults to the
 private character used in Powerline fonts that looks like a lock.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_SOFT_DIVIDER: string = ""  # U+E0B1
+.B POWERLINE_SOFT_DIVIDER:  string  =  ""  # U+E0B1
 The divider character between similar sections, defaults to the private
 character used in Powerline fonts that looks like a thin right arrow.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_SPACER: string = "\ "  # U+00A0: non\-breaking space
+.B POWERLINE_SPACER:  string  =  "\ "  # U+00A0: non\-breaking space
 The marker character used to pad sections, defaults to the
 non\-breaking space character.
 .sp
@@ -640,12 +711,12 @@ collapsing to one space, loosing the padding.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_STASH_MARKER: string = "ST"
+.B POWERLINE_STASH_MARKER:  string  =  "ST"
 The marker string used to indicate stashes exist in the VCS repository.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_VCS_MARKER: string = ""  # U+E0A0
+.B POWERLINE_VCS_MARKER:  string  =  ""  # U+E0A0
 The marker character used to indicate a VCS repository, defaults to the
 private character used in Powerline fonts that looks like a branching commit
 history.
@@ -664,43 +735,43 @@ commas for clarity.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_ERROR_COLOR: array<int> = (231, 52, 0, 0, 7, 1)
+.B POWERLINE_ERROR_COLOR:  array<int>  =  (231, 52, 0, 0, 7, 1)
 Color for the error code section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_HOST_COLOR: array<int> = (220, 166, 0, 0, 3, 2)
+.B POWERLINE_HOST_COLOR:  array<int>  =  (220, 166, 0, 0, 3, 2)
 Color for the hostname section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_JOBS_COLOR: array<int> = (220, 166, 0, 0, 3, 2)
+.B POWERLINE_JOBS_COLOR:  array<int>  =  (220, 166, 0, 0, 3, 2)
 Color for the shell jobs section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_PATH_COLOR: array<int> = (250, 240, 0, 0, 7, 0)
+.B POWERLINE_PATH_COLOR:  array<int>  =  (250, 240, 0, 0, 7, 0)
 Color for the current working directory section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_PATH_LAST_COLOR: array<int> = (252, 240, 1, 0, 7, 0)
+.B POWERLINE_PATH_LAST_COLOR:  array<int>  =  (252, 240, 1, 0, 7, 0)
 Color for the current working directory last subsection.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_PATH_SEPARATOR_COLOR: array<int> = (245, 240, 0, 0, 7, 0)
+.B POWERLINE_PATH_SEPARATOR_COLOR:  array<int>  =  (245, 240, 0, 0, 7, 0)
 Color for the current working directory subsection separator.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_PATH_SHORTENED_COLOR: array<int> = (245, 240, 0, 0, 7, 0)
+.B POWERLINE_PATH_SHORTENED_COLOR:  array<int>  =  (245, 240, 0, 0, 7, 0)
 Color for any sections in the current working directory that are shortened to
 make the path fit in \fBLP_PATH_LENGTH\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_PATH_VCS_COLOR: array<int> = (147, 240, 1, 0, 4, 0)
+.B POWERLINE_PATH_VCS_COLOR:  array<int>  =  (147, 240, 1, 0, 4, 0)
 Color for the current working directory segment corresponding to the current
 VCS repository root directory.
 .sp
@@ -708,27 +779,27 @@ VCS repository root directory.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_PYTHON_ENV_COLOR: array<int> = (231, 74, 0, 0, 7, 4)
+.B POWERLINE_PYTHON_ENV_COLOR:  array<int>  =  (231, 74, 0, 0, 7, 4)
 Color for the Python environment section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_USER_COLOR: array<int> = (231, 31, 1, 0, 7, 6)
+.B POWERLINE_USER_COLOR:  array<int>  =  (231, 31, 1, 0, 7, 6)
 Color for the username section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_VCS_CLEAN_COLOR: array<int> = (250, 236, 0, 0, 7, 0)
+.B POWERLINE_VCS_CLEAN_COLOR:  array<int>  =  (250, 236, 0, 0, 7, 0)
 Color for the VCS section if the repository is clean.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_VCS_DIRTY_COLOR: array<int> = (220, 236, 0, 0, 3, 0)
+.B POWERLINE_VCS_DIRTY_COLOR:  array<int>  =  (220, 236, 0, 0, 3, 0)
 Color for the VCS section if the repository is not clean.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_VCS_STASH_COLOR: array<int> = (220, 236, 0, 0, 3, 0)
+.B POWERLINE_VCS_STASH_COLOR:  array<int>  =  (220, 236, 0, 0, 3, 0)
 Color for the VCS stash subsection.
 .UNINDENT
 .SS Powerline Full
@@ -758,11 +829,15 @@ When Liquidprompt is displaying nearly everything, it may look like this:
 .sp
 Like the \fBpowerline\fP theme, you will need a compatible font.
 See the \fI\%Powerline Fonts installation docs\fP for help.
-.SS Configuation
+.SS Configuration
 .SS Liquidprompt Configuration
 .sp
 All Liquidprompt config options are respected, \fBexcept for\fP:
 .INDENT 0.0
+.IP \(bu 2
+\fBLP_COLOR_AWS_PROFILE\fP
+.IP \(bu 2
+\fBLP_COLOR_CONTAINER\fP
 .IP \(bu 2
 \fBLP_COLOR_DIRSTACK\fP
 .IP \(bu 2
@@ -778,27 +853,37 @@ All Liquidprompt config options are respected, \fBexcept for\fP:
 .IP \(bu 2
 \fBLP_COLOR_JOB_Z\fP
 .IP \(bu 2
-\fBLP_COLOR_MARK\fP
+\fBLP_COLOR_KUBECONTEXT\fP
 .IP \(bu 2
 \fBLP_COLOR_MARK_ROOT\fP
 .IP \(bu 2
 \fBLP_COLOR_MARK_SUDO\fP
 .IP \(bu 2
-\fBLP_COLOR_NOWRITE\fP
+\fBLP_COLOR_MARK\fP
 .IP \(bu 2
-\fBLP_COLOR_PATH\fP
+\fBLP_COLOR_NODE_VENV\fP
+.IP \(bu 2
+\fBLP_COLOR_NOWRITE\fP
 .IP \(bu 2
 \fBLP_COLOR_PATH_ROOT\fP
 .IP \(bu 2
+\fBLP_COLOR_PATH\fP
+.IP \(bu 2
 \fBLP_COLOR_PROXY\fP
 .IP \(bu 2
+\fBLP_COLOR_RUBY_VENV\fP
+.IP \(bu 2
 \fBLP_COLOR_RUNTIME\fP
+.IP \(bu 2
+\fBLP_COLOR_SHLVL\fP
 .IP \(bu 2
 \fBLP_COLOR_SSH\fP
 .IP \(bu 2
 \fBLP_COLOR_SU\fP
 .IP \(bu 2
 \fBLP_COLOR_TELNET\fP
+.IP \(bu 2
+\fBLP_COLOR_TERRAFORM\fP
 .IP \(bu 2
 \fBLP_COLOR_TIME\fP
 .IP \(bu 2
@@ -822,9 +907,9 @@ All Liquidprompt config options are respected, \fBexcept for\fP:
 .IP \(bu 2
 \fBLP_ENABLE_SUDO\fP
 .IP \(bu 2
-\fBLP_MARK_BRACKET_OPEN\fP
-.IP \(bu 2
 \fBLP_MARK_BRACKET_CLOSE\fP
+.IP \(bu 2
+\fBLP_MARK_BRACKET_OPEN\fP
 .IP \(bu 2
 \fBLP_MARK_BZR\fP
 .IP \(bu 2
@@ -867,71 +952,180 @@ Powerline Full adds these config options:
 .SS Markers
 .INDENT 0.0
 .TP
-.B POWERLINE_CHROOT_MARKER: string = "chroot: "
+.B POWERLINE_AWS_PROFILE_MARKER:  string  =  "AWS: "
+The marker string used to indicate the following string is the name of an
+AWS profile.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_CHROOT_MARKER:  string  =  "chroot: "
 The marker string used to indicate the following string is a chroot.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_PROXY_MARKER: string = "proxy: "
+.B POWERLINE_KUBECONTEXT_MARKER:  string  =  $LP_MARK_KUBECONTEXT
+The marker string used to indicate the following string is the name of a
+kubectl context.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_NODE_ENV_MARKER:  string  =  "node: "
+The marker string used to indicate the following string is a Node.js
+environment.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_PROXY_MARKER:  string  =  "proxy: "
 The marker string used to indicate the following string is a HTTP proxy.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_SOFTWARE_COLLECTION_MARKER: string = "(sc) "
+.B POWERLINE_RUBY_ENV_MARKER:  string  =  "ruby: "
+The marker string used to indicate the following string is a Ruby
+environment.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_SOFTWARE_COLLECTION_MARKER:  string  =  "(sc) "
 The marker string used to indicate the following string is a Red Hat Software
 Collection.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_TERRAFORM_ENV_MARKER:  string  =  "(tf) "
+The marker string used to indicate the following string is a Terraform
+workspace.
+.sp
+New in version 2.1.
+
 .UNINDENT
 .SS Colors
 .INDENT 0.0
 .TP
-.B POWERLINE_BATTERY_COLOR: array<int> = (\-1, 238, 0, 0, \-1, 0)
+.B POWERLINE_AWS_PROFILE_COLOR:  array<int>  =  (190, 236, 0, 0, 3, 0)
+Color for the AWS profile section.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_BATTERY_COLOR:  array<int>  =  (\-1, 238, 0, 0, \-1, 0)
 Color for the battery section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_CHROOT_COLOR: array<int> = (219, 30, 0, 0, 7, 4)
+.B POWERLINE_CHROOT_COLOR:  array<int>  =  (219, 30, 0, 0, 7, 4)
 Color for the chroot section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_DIRSTACK_COLOR: array<int> = $POWERLINE_NEUTRAL_COLOR
+.B POWERLINE_CONTAINER_COLOR:  array<int>  =  $POWERLINE_NEUTRAL_COLOR
+Color for the container indicator section.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_DIRSTACK_COLOR:  array<int>  =  $POWERLINE_NEUTRAL_COLOR
 Color for the directory stack section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_LOAD_COLOR: array<int> = (\-1, 148, 0, 0, \-1, 3)
+.B POWERLINE_KUBECONTEXT_COLOR:  array<int>  =  (231, 74, 0, 0, 7, 4)
+Color for the Kubernetes context section.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_LOAD_COLOR:  array<int>  =  (\-1, 148, 0, 0, \-1, 3)
 Color for the CPU load section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_NEUTRAL_COLOR: array<int> = (252, 234, 0, 0, 7, 0)
+.B POWERLINE_NEUTRAL_COLOR:  array<int>  =  (252, 234, 0, 0, 7, 0)
 Color for all neutral sections, \fBLP_PS1_PREFIX\fP and
 \fBLP_PS1_POSTFIX\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_PROXY_COLOR: array<int> = (21, 219, 1, 0, 4, 7)
+.B POWERLINE_NODE_ENV_COLOR:  array<int>  =  $POWERLINE_PYTHON_ENV_COLOR
+Color for the Node.js environment section.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_PROXY_COLOR:  array<int>  =  (21, 219, 1, 0, 4, 7)
 Color for the HTTP proxy section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_RUNTIME_COLOR: array<int> = (226, 17, 0, 0, 3, 4)
+.B POWERLINE_RUBY_ENV_COLOR:  array<int>  =  $POWELINE_PYTHON_ENV_COLOR
+Color for the Ruby environment section.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_RUNTIME_COLOR:  array<int>  =  (226, 17, 0, 0, 3, 4)
 Color for the command runtime section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_SOFTWARE_COLLECTIONS_COLOR: array<int> = (231, 62, 0, 0, 7, 5)
+.B POWERLINE_SHLVL_COLOR:  array<int>  =  (231, 58, 0, 0, 7, 2)
+Color for the nested shell level section.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_SOFTWARE_COLLECTIONS_COLOR:  array<int>  =  (231, 62, 0, 0, 7, 5)
 Color for the Red Hat Software Collections section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_TEMPERATURE_COLOR: array<int> = (\-1, 240, 0, 0, \-1, 0)
+.B POWERLINE_TEMPERATURE_COLOR:  array<int>  =  (\-1, 240, 0, 0, \-1, 0)
 Color for the temperature section.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B POWERLINE_TIME_COLOR: array<int> = (33, 17, 0, 0, 5, 4)
+.B POWERLINE_TERRAFORM_ENV_COLOR:  array<int>  =  (231, 182, 0, 0, 7, 4)
+Color for the Terraform workspace.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_TIME_COLOR:  array<int>  =  (33, 17, 0, 0, 5, 4)
 Color for the current time section.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B POWERLINE_WIFI_STRENGTH_COLOR:  array<int>  =  (\-1, 148, 0, 0, \-1, 3)
+Color for the wireless signal strength section.
+.sp
+New in version 2.1.
+
 .UNINDENT
 .SH CUSTOM THEMES
 .INDENT 0.0
@@ -1070,6 +1264,6 @@ To switch back to the default theme, call \fBlp_theme()\fP again with
 If you add the theme source commands to your shell startup file, you will have
 your favorite themes ready to be switched to at any time.
 .SH COPYRIGHT
-2011-2021, Liquidprompt team
+2011-2022, Liquidprompt team
 .\" Generated by docutils manpage writer.
 .

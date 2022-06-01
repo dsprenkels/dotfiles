@@ -54,6 +54,26 @@ Formatting
 
 .. _`ANSI escape color code`: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 
+Battery
+-------
+
+.. function:: __lp_battery_acpi() -> var:lp_battery, var:lp_battery_status
+
+   Returns the status and remaining capacity of the battery, as reported by
+   the `acpi` tool. This function is available only on Linux, and requires
+   `acpi` to be installed.
+
+   .. versionadded:: 2.1
+
+.. function:: __lp_battery_sysfs() -> var:lp_battery, var:lp_battery_status
+
+   Returns the status and remaining capacity of the battery, using `sysfs`.
+   This is the default method. If multiple batteries are present, returns the
+   status of the first battery found. This function is available only on Linux
+   systems.
+
+   .. versionadded:: 2.1
+
 Git
 ---
 
@@ -155,6 +175,14 @@ Path
 Prompt
 ------
 
+.. function:: __lp_before_command()
+
+   Used only by Bash to hack the DEBUG trap to run functions before the user
+   command executes.
+
+   .. versionchanged:: 2.1
+      Renamed from the Bash version of ``__lp_runtime_before``.
+
 .. function:: __lp_set_prompt()
 
    Setup features that need to be handled outside of the themes, like
@@ -179,8 +207,9 @@ Runtime
 
 .. function:: __lp_runtime_after()
 
-   Hooks into the shell to run directly after the user command returns, to
-   record the current time, and calculate how long the command ran for.
+   Called by :func:`__lp_set_prompt` to run directly after the user command
+   returns, to record the current time and calculate how long the command ran
+   for.
 
    .. versionchanged:: 2.0
       Renamed from ``_lp_runtime_after``.
@@ -209,6 +238,22 @@ Theme
 
    .. versionadded:: 2.0
 
+Title
+-----
+
+.. function:: __lp_get_last_command_line() -> var:command
+
+   Returns the whole command line most recently submitted by the user.
+
+   .. versionadded:: 2.1
+
+.. function:: __lp_print_title_command()
+
+   Sets the terminal title to the normal set title, postpended with the
+   currently running command.
+
+   .. versionadded:: 2.1
+
 Temperature
 -----------
 .. function:: __lp_temp_detect() -> var:_LP_TEMP_FUNCTION
@@ -219,6 +264,9 @@ Temperature
 
    .. versionchanged:: 2.0
       Renamed from ``_lp_temp_detect``.
+
+   .. versionchanged:: 2.1
+      No longer takes arguments of what backends to try.
 
 .. function:: __lp_temp_acpi() -> var:lp_temperature
 
@@ -235,6 +283,12 @@ Temperature
    .. versionchanged:: 2.0
       Renamed from ``_lp_temp_sensors``.
       Return variable changed from ``temperature``.
+
+.. function:: __lp_temp_sysfs() -> var:lp_temperature
+
+   A temperature backend reading directly from the Linux sysfs filesystem.
+
+   .. versionadded:: 2.1
 
 Utility
 ---------
@@ -275,3 +329,22 @@ Utility
    replacement for ``wc -l``.
 
    .. versionadded:: 2.0
+
+.. function:: __lp_strip_escapes(string) -> var:ret
+
+   Remove shell escape characters so *string* prints correctly in a terminal
+   title, or can be measured for printing character length.
+
+   .. versionadded:: 2.1
+
+Wireless
+--------
+.. function:: __lp_wifi_signal_strength_raw() -> var:level
+
+   Returns the lowest raw wireless signal strength in dBm. Return ``2`` if no
+   data is found.
+
+   Implementation depends on operating system. This function does not exist on
+   all operating systems.
+
+   .. versionadded:: 2.1

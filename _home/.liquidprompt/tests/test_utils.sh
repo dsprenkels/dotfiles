@@ -4,13 +4,21 @@ set -u
 
 . ../liquidprompt --no-activate
 
-function test_as_text {
-  # The escape sequences are different on Bash and Zsh
-  assertEquals "basic text removal" "a normal string without colors" \
-    "$(_lp_as_text "${_LP_OPEN_ESC}bad text${_LP_CLOSE_ESC}a normal string without ${_LP_OPEN_ESC}color${_LP_CLOSE_ESC}colors")"
+function test_strip_escape {
+  local ret
 
-  assertEquals "control character removal" "string" \
-    "$(_lp_as_text "${_LP_OPEN_ESC}"$'\a\b'"${_LP_CLOSE_ESC}str${_LP_OPEN_ESC}"$'\001\E'"${_LP_CLOSE_ESC}ing")"
+  # The escape sequences are different on Bash and Zsh
+  __lp_strip_escapes "${_LP_OPEN_ESC}bad text${_LP_CLOSE_ESC}a normal string without ${_LP_OPEN_ESC}color${_LP_CLOSE_ESC}colors"
+  assertEquals "basic text removal" "a normal string without colors" "$ret"
+
+  __lp_strip_escapes "${_LP_OPEN_ESC}"$'\a\b'"${_LP_CLOSE_ESC}str${_LP_OPEN_ESC}"$'\001\E'"${_LP_CLOSE_ESC}ing"
+  assertEquals "control character internal removal" "string" "$ret"
+
+  __lp_strip_escapes "${_LP_OPEN_ESC}"$'\a\b'"${_LP_CLOSE_ESC}st"$'\t'"r${_LP_OPEN_ESC}"$'\001\E'"${_LP_CLOSE_ESC}ing"
+  assertEquals "control character external removal" $'st\tring' "$ret"
+
+  __lp_strip_escapes "${_LP_OPEN_ESC}"$'\a\b'"${_LP_CLOSE_ESC}st\\\\r${_LP_OPEN_ESC}"$'\001\E'"${_LP_CLOSE_ESC}ing"
+  assertEquals "control character escaped removal" $'st\\ring' "$ret"
 }
 
 function test_line_count {
@@ -89,6 +97,40 @@ function test_floating_scale {
 
   __lp_floating_scale '12.345' 10
   assertEquals "scaling 10" '123' "$ret"
+}
+
+function test_get_last_command_line() {
+  if (( _LP_SHELL_zsh )); then
+    # This is simpler, and only shows one test as skipped instead of per assert.
+    startSkipping
+    assertTrue ''
+    endSkipping
+    return
+  fi
+
+  builtin() {
+    printf '%s\n' "$history_line"
+  }
+
+  local command
+
+  history_line=' 100  command'
+  __lp_get_last_command_line
+  assertEquals "normal history" 'command' "$command"
+
+  history_line='1000  a command'
+  __lp_get_last_command_line
+  assertEquals "no leading space" 'a command' "$command"
+
+  history_line='    0  a different command'
+  __lp_get_last_command_line
+  assertEquals "single digit index" 'a different command' "$command"
+
+  history_line='  119* a modified command'
+  __lp_get_last_command_line
+  assertEquals "modified history" 'a modified command' "$command"
+
+  unset -f builtin
 }
 
 function test_pwd_tilde {
@@ -275,6 +317,17 @@ function test_path_format_from_path_left() {
   LP_PATH_LENGTH=$(( ${#PWD} - 1 ))
   _lp_path_format ''
   assertEquals "no shortening" "/tmp/a/b/c/last" "$lp_path_format"
+
+  PWD=$'/a_fake_\\n_newline/and_%100_fresh/and_a_real_\n_newline'
+  LP_PATH_LENGTH=${#PWD}
+  _lp_path_format ''
+  if (( _LP_SHELL_zsh )); then
+    assertEquals "shell escapes" $'/a_fake_\\n_newline/and_%100_fresh/and_a_real_\n_newline' "$lp_path"
+    assertEquals "shell escapes format" $'/a_fake_\\\\n_newline/and_%%100_fresh/and_a_real_\n_newline' "$lp_path_format"
+  else
+    assertEquals "shell escapes" $'/a_fake_\\n_newline/and_%100_fresh/and_a_real_\n_newline' "$lp_path"
+    assertEquals "shell escapes format" $'/a_fake_\\\\n_newline/and_%100_fresh/and_a_real_\n_newline' "$lp_path_format"
+  fi
 }
 
 function test_path_format_from_dir_right {

@@ -59,8 +59,8 @@ See the `Powerline Fonts installation docs`_ for help.
 
 .. _`Powerline fonts installation docs`: https://powerline.readthedocs.io/en/latest/installation.html#fonts-installation
 
-Configuation
-============
+Configuration
+=============
 
 Liquidprompt Configuration
 --------------------------
@@ -288,13 +288,15 @@ Setup
 Like the ``powerline`` theme, you will need a compatible font.
 See the `Powerline Fonts installation docs`_ for help.
 
-Configuation
-============
+Configuration
+=============
 
 Liquidprompt Configuration
 --------------------------
 All Liquidprompt config options are respected, **except for**:
 
+* :attr:`LP_COLOR_AWS_PROFILE`
+* :attr:`LP_COLOR_CONTAINER`
 * :attr:`LP_COLOR_DIRSTACK`
 * :attr:`LP_COLOR_ERR`
 * :attr:`LP_COLOR_HOST`
@@ -302,17 +304,22 @@ All Liquidprompt config options are respected, **except for**:
 * :attr:`LP_COLOR_JOB_D`
 * :attr:`LP_COLOR_JOB_R`
 * :attr:`LP_COLOR_JOB_Z`
-* :attr:`LP_COLOR_MARK`
+* :attr:`LP_COLOR_KUBECONTEXT`
 * :attr:`LP_COLOR_MARK_ROOT`
 * :attr:`LP_COLOR_MARK_SUDO`
+* :attr:`LP_COLOR_MARK`
+* :attr:`LP_COLOR_NODE_VENV`
 * :attr:`LP_COLOR_NOWRITE`
-* :attr:`LP_COLOR_PATH`
 * :attr:`LP_COLOR_PATH_ROOT`
+* :attr:`LP_COLOR_PATH`
 * :attr:`LP_COLOR_PROXY`
+* :attr:`LP_COLOR_RUBY_VENV`
 * :attr:`LP_COLOR_RUNTIME`
+* :attr:`LP_COLOR_SHLVL`
 * :attr:`LP_COLOR_SSH`
 * :attr:`LP_COLOR_SU`
 * :attr:`LP_COLOR_TELNET`
+* :attr:`LP_COLOR_TERRAFORM`
 * :attr:`LP_COLOR_TIME`
 * :attr:`LP_COLOR_USER_ALT`
 * :attr:`LP_COLOR_USER_LOGGED`
@@ -324,8 +331,8 @@ All Liquidprompt config options are respected, **except for**:
 * :attr:`LP_ENABLE_PERM`
 * :attr:`LP_ENABLE_SSH_COLORS`
 * :attr:`LP_ENABLE_SUDO`
-* :attr:`LP_MARK_BRACKET_OPEN`
 * :attr:`LP_MARK_BRACKET_CLOSE`
+* :attr:`LP_MARK_BRACKET_OPEN`
 * :attr:`LP_MARK_BZR`
 * :attr:`LP_MARK_DEFAULT`
 * :attr:`LP_MARK_DISABLED`
@@ -354,17 +361,53 @@ Powerline Full adds these config options:
 Markers
 _______
 
+.. attribute:: POWERLINE_AWS_PROFILE_MARKER
+   :type: string
+   :value: "AWS: "
+
+   The marker string used to indicate the following string is the name of an
+   AWS profile.
+
+   .. versionadded:: 2.1
+
 .. attribute:: POWERLINE_CHROOT_MARKER
    :type: string
    :value: "chroot: "
 
    The marker string used to indicate the following string is a chroot.
 
+.. attribute:: POWERLINE_KUBECONTEXT_MARKER
+   :type: string
+   :value: $LP_MARK_KUBECONTEXT
+
+   The marker string used to indicate the following string is the name of a
+   kubectl context.
+
+   .. versionadded:: 2.1
+
+.. attribute:: POWERLINE_NODE_ENV_MARKER
+   :type: string
+   :value: "node: "
+
+   The marker string used to indicate the following string is a Node.js
+   environment.
+
+   .. versionadded:: 2.1
+
 .. attribute:: POWERLINE_PROXY_MARKER
    :type: string
    :value: "proxy: "
 
    The marker string used to indicate the following string is a HTTP proxy.
+
+.. attribute:: POWERLINE_RUBY_ENV_MARKER
+   :type: string
+   :value: "ruby: "
+
+   The marker string used to indicate the following string is a Ruby
+   environment.
+
+   .. versionadded:: 2.1
 
 .. attribute:: POWERLINE_SOFTWARE_COLLECTION_MARKER
    :type: string
@@ -373,8 +416,25 @@ _______
    The marker string used to indicate the following string is a Red Hat Software
    Collection.
 
+.. attribute:: POWERLINE_TERRAFORM_ENV_MARKER
+   :type: string
+   :value: "(tf) "
+
+   The marker string used to indicate the following string is a Terraform
+   workspace.
+
+   .. versionadded:: 2.1
+
 Colors
 ______
+
+.. attribute:: POWERLINE_AWS_PROFILE_COLOR
+   :type: array<int>
+   :value: (190, 236, 0, 0, 3, 0)
+
+   Color for the AWS profile section.
+
+   .. versionadded:: 2.1
 
 .. attribute:: POWERLINE_BATTERY_COLOR
    :type: array<int>
@@ -388,11 +448,27 @@ ______
 
    Color for the chroot section.
 
+.. attribute:: POWERLINE_CONTAINER_COLOR
+   :type: array<int>
+   :value: $POWERLINE_NEUTRAL_COLOR
+
+   Color for the container indicator section.
+
+   .. versionadded:: 2.1
+
 .. attribute:: POWERLINE_DIRSTACK_COLOR
    :type: array<int>
    :value: $POWERLINE_NEUTRAL_COLOR
 
    Color for the directory stack section.
+
+.. attribute:: POWERLINE_KUBECONTEXT_COLOR
+   :type: array<int>
+   :value: (231, 74, 0, 0, 7, 4)
+
+   Color for the Kubernetes context section.
+
+   .. versionadded:: 2.1
 
 .. attribute:: POWERLINE_LOAD_COLOR
    :type: array<int>
@@ -407,17 +483,41 @@ ______
    Color for all neutral sections, :attr:`LP_PS1_PREFIX` and
    :attr:`LP_PS1_POSTFIX`.
 
+.. attribute:: POWERLINE_NODE_ENV_COLOR
+   :type: array<int>
+   :value: $POWERLINE_PYTHON_ENV_COLOR
+
+   Color for the Node.js environment section.
+
+   .. versionadded:: 2.1
+
 .. attribute:: POWERLINE_PROXY_COLOR
    :type: array<int>
    :value: (21, 219, 1, 0, 4, 7)
 
    Color for the HTTP proxy section.
 
+.. attribute:: POWERLINE_RUBY_ENV_COLOR
+   :type: array<int>
+   :value: $POWELINE_PYTHON_ENV_COLOR
+
+   Color for the Ruby environment section.
+
+   .. versionadded:: 2.1
+
 .. attribute:: POWERLINE_RUNTIME_COLOR
    :type: array<int>
    :value: (226, 17, 0, 0, 3, 4)
 
    Color for the command runtime section.
+
+.. attribute:: POWERLINE_SHLVL_COLOR
+   :type: array<int>
+   :value: (231, 58, 0, 0, 7, 2)
+
+   Color for the nested shell level section.
+
+   .. versionadded:: 2.1
 
 .. attribute:: POWERLINE_SOFTWARE_COLLECTIONS_COLOR
    :type: array<int>
@@ -431,9 +531,24 @@ ______
 
    Color for the temperature section.
 
+.. attribute:: POWERLINE_TERRAFORM_ENV_COLOR
+   :type: array<int>
+   :value: (231, 182, 0, 0, 7, 4)
+
+   Color for the Terraform workspace.
+
+   .. versionadded:: 2.1
+
 .. attribute:: POWERLINE_TIME_COLOR
    :type: array<int>
    :value: (33, 17, 0, 0, 5, 4)
 
    Color for the current time section.
 
+.. attribute:: POWERLINE_WIFI_STRENGTH_COLOR
+   :type: array<int>
+   :value: (-1, 148, 0, 0, -1, 3)
+
+   Color for the wireless signal strength section.
+
+   .. versionadded:: 2.1

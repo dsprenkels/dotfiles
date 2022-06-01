@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "LIQUIDPROMPT" "3" "May 30, 2021" "" "Liquidprompt"
+.TH "LIQUIDPROMPT" "3" "May 27, 2022" "" "Liquidprompt"
 .SH NAME
 liquidprompt \- Liquidprompt functions
 .sp
@@ -63,6 +63,8 @@ New in version 2.0.
 .INDENT 0.0
 .TP
 .B lp_title([title_string])
+Not to be confused with \fB_lp_title()\fP\&.
+.sp
 Set \fItitle_string\fP as the terminal title. This overrides any title set by the
 current theme.
 .sp
@@ -233,6 +235,8 @@ To unset the prefix, call \fI\%prompt_tag()\fP with no arguments.
 \fI\%Temperature\fP
 .IP \(bu 2
 \fI\%Time\fP
+.IP \(bu 2
+\fI\%Wireless\fP
 .UNINDENT
 .SS Version Control Data Functions
 .INDENT 0.0
@@ -260,10 +264,10 @@ See the default theme function \fB_lp_vcs_details_color()\fP for an example of
 this.
 .INDENT 0.0
 .TP
-.B _lp_find_vcs() -> var:lp_vcs_type, var:lp_vcs_root
+.B _lp_find_vcs() -> var:lp_vcs_type, var:lp_vcs_root, var:lp_vcs_dir, var:lp_vcs_subtype
 Returns \fBtrue\fP if the current directory is part of a version control
-repository. If not, returns \fB1\fP\&. Returns the VCS type ID and the repository
-root directory.
+repository. If not, returns \fB1\fP\&. Returns the VCS type ID, subtype if one
+exists, the VCS data directory, and the repository root directory.
 .sp
 If the current directory is disabled for version control using
 \fBLP_DISABLED_VCS_PATHS\fP (checked using \fI\%_lp_are_vcs_enabled()\fP),
@@ -278,7 +282,27 @@ repository, only looking for the existence of a database. It does not check
 if the database is valid or healthy. Use \fI\%_lp_vcs_active()\fP to test for
 that.
 .sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+\fIlp_vcs_dir\fP will not be set for Fossil repositories. Protect it with
+\fB"${lp_vcs_dir\-}"\fP\&.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+\fIlp_vcs_subtype\fP will not be set usually. The only currently supported
+subtypes are "vcsh" and "svn", which are subtypes of "git".
+.UNINDENT
+.UNINDENT
+.sp
 New in version 2.0.
+
+.sp
+Changed in version 2.1: Added the \fIlp_vcs_dir\fP and \fIlp_vcs_subtype\fP return values.
+Added support for checking the \fBGIT_DIR\fP environment variable.
 
 .UNINDENT
 .INDENT 0.0
@@ -311,14 +335,8 @@ New in version 2.0.
 \fBNOTE:\fP
 .INDENT 0.0
 .INDENT 3.5
-All following generic functions can exit with return codes higher than their
-normal disabled exit code. If the active VCS does not support a feature, the
-data function will not be defined, and therefore the shell will return an
-error code much higher than \fB2\fP\&. Compare using greater\-or\-equal if checking
-for not supported error codes.
-.sp
 Unless otherwise documented, the following functions return \fB0\fP for good
-data, \fB1\fP for no data, and \fB2\fP or higher for unsupported function.
+data, \fB1\fP for no data, and \fB2\fP for unsupported function.
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -358,7 +376,7 @@ New in version 2.0.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B _lp_vcs_commits_off_remote() -> var:lp_vcs_commit_ahead,                                            var:lp_vcs_commit_behind
+.B _lp_vcs_commits_off_remote() -> var:lp_vcs_commit_ahead, var:lp_vcs_commit_behind
 Returns \fBtrue\fP if there are commits on the current branch that are not on
 the remote tracking branch, or commits on the remote tracking branch that are
 not on this branch. Returns \fB1\fP if there are no differing commits. Returns
@@ -374,7 +392,7 @@ New in version 2.0.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B _lp_vcs_head_status() -> var:lp_vcs_head_status,                                     var:lp_vcs_head_details
+.B _lp_vcs_head_status() -> var:lp_vcs_head_status, var:lp_vcs_head_details
 Return \fBtrue\fP if the repo is in a special or unusual state. Return the
 special status, and any extra details (like progress in a rebase) if
 applicable.
@@ -799,7 +817,7 @@ New in version 2.0.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B _lp_git_commits_off_remote() -> var:lp_vcs_commit_ahead,                                            var:lp_vcs_commit_behind
+.B _lp_git_commits_off_remote() -> var:lp_vcs_commit_ahead, var:lp_vcs_commit_behind
 Returns \fBtrue\fP if there are commits on the current branch that are not on
 the remote tracking branch, or commits on the remote tracking branch that are
 not on this branch. Returns \fB1\fP if there are no differing commits. Returns
@@ -812,7 +830,7 @@ New in version 2.0.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B _lp_git_head_status() -> var:lp_vcs_head_status,                                     var:lp_vcs_head_details
+.B _lp_git_head_status() -> var:lp_vcs_head_status, var:lp_vcs_head_details
 Return \fBtrue\fP if the repository is in a special or unusual state. Return
 the special status, and any extra details (like progress in a rebase) if
 applicable.
@@ -976,7 +994,7 @@ New in version 2.0.
 .INDENT 0.0
 .TP
 .B _lp_hg_commits_off_remote()
-Returns \fB3\fP (disabled).
+Returns \fB2\fP (disabled).
 .sp
 Mercurial does not keep a local copy of the remote state, so checking this
 will require a connection to the remote server. This means it is often
@@ -1203,12 +1221,45 @@ If the threshold is not surpassed, the battery level is still returned.
 The threshold is configured with \fBLP_BATTERY_THRESHOLD\fP\&.
 .sp
 Can be disabled by \fBLP_ENABLE_BATT\fP\&.
+.sp
+Changed in version 2.1: Implemented \fIsysfs\fP method as the default way of getting battery status.
+
 .UNINDENT
 .SS Development Environment
 .INDENT 0.0
 .TP
+.B _lp_kubernetes_context() -> var:lp_kubernetes_context, var:lp_kubernetes_namespace
+Returns \fBtrue\fP if a Kubernetes context is found.
+Returns the Kubernetes context name or the first name component.
+.sp
+Splitting long context names into components is defined by
+\fBLP_DELIMITER_KUBECONTEXT_SUFFIX\fP and
+\fBLP_DELIMITER_KUBECONTEXT_PREFIX\fP\&. Both use greedy matches \- see
+\&../config for examples.
+.sp
+If enabled by \fBLP_ENABLE_KUBE_NAMESPACE\fP, will also return the default
+namespace for the current context, if one is set.
+.sp
+Can be disabled by \fBLP_ENABLE_KUBECONTEXT\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_node_env() -> var:lp_node_env
+Returns \fBtrue\fP if a Node.js environment is detected. Returns the virtual
+environment name.
+.sp
+Can be enabled by \fBLP_ENABLE_NODE_VENV\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
 .B _lp_python_env() -> var:lp_python_env
-Retuns \fBtrue\fP if a Python or Conda environment is detected. Returns the
+Returns \fBtrue\fP if a Python or Conda environment is detected. Returns the
 virtual environment name.
 .sp
 If the environment name contains a forward slash (\fB/\fP), only the substring
@@ -1217,6 +1268,24 @@ after the last forward slash is returned.
 Can be disabled by \fBLP_ENABLE_VIRTUALENV\fP\&.
 .sp
 New in version 2.0.
+
+.sp
+Changed in version 2.1: Displays the "prompt string" first (the \fB\-\-prompt\fP argument when setting
+up the virtualenv).
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_ruby_env() -> var:lp_ruby_env
+Returns \fBtrue\fP if a RVM or RBENV ruby environment is detected. Returns the
+virtual environment name.
+.sp
+In the case of a RVM environment, the label displayed can be customized
+with the \fBLP_RUBY_RVM_PROMPT_OPTIONS\fP\&.
+.sp
+Can be disabled by \fBLP_ENABLE_RUBY_VENV\fP\&.
+.sp
+New in version 2.1.
 
 .UNINDENT
 .INDENT 0.0
@@ -1232,7 +1301,30 @@ Can be disabled by \fBLP_ENABLE_SCLS\fP\&.
 New in version 2.0.
 
 .UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_terraform_env() -> var:lp_terraform_env
+Returns \fBtrue\fP if a Terraform workspace is detected. Returns the workspace
+name.
+.sp
+Can be enabled by \fBLP_ENABLE_TERRAFORM\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
 .SS Environment
+.INDENT 0.0
+.TP
+.B _lp_aws_profile() -> var:lp_aws_profile
+Returns \fBtrue\fP if the \fBAWS_PROFILE\fP, \fBAWS_DEFAULT_PROFILE\fP,
+or \fBAWS_VAULT\fP variables are found in the environment
+(in that order of preference). Returns the contents of the variable.
+.sp
+Can be disabled by \fBLP_ENABLE_AWS_PROFILE\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
 .INDENT 0.0
 .TP
 .B _lp_connected_display()
@@ -1249,11 +1341,11 @@ Returns a string matching the connection context of the shell. Valid values:
 .IP \(bu 2
 \fBssh\fP \- connected over OpenSSH
 .IP \(bu 2
-\fBlcl\fP \- running in a local terminal
+\fBtel\fP \- connected over Telnet
 .IP \(bu 2
 \fBsu\fP \- running in a \fBsu\fP or \fBsudo\fP shell
 .IP \(bu 2
-\fBtel\fP \- connected over Telnet
+\fBlcl\fP \- running in a local terminal
 .UNINDENT
 .sp
 It is not possible for more than one context to be returned. The contexts
@@ -1263,6 +1355,39 @@ returned.
 It is not possible for no context to be returned.
 .sp
 Changed in version 2.0: Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_container() -> var:lp_container
+Returns \fBtrue\fP if the shell is running in a container.  In that case,
+the return variable is set to a string matching the container type. Possible
+values include (but are not limited to):
+.INDENT 7.0
+.IP \(bu 2
+\fBSinglrty\fP \- running in a \fI\%Singularity\fP container
+.IP \(bu 2
+\fBToolbox\fP \- running in a \fI\%Toolbox\fP container
+.IP \(bu 2
+\fBPodman\fP \- running in a \fI\%Podman\fP container
+.IP \(bu 2
+\fBDocker\fP \- running in a \fI\%Docker\fP container
+.IP \(bu 2
+\fBLXC\fP \- running in an \fI\%LXC\fP container
+.IP \(bu 2
+\fBnspawn\fP \- running in a \fI\%systemd\-nspawn\fP container
+.UNINDENT
+.sp
+It is not possible to detect more than one containerization type to be
+returned.  The containers are checked in the order listed above, and the
+first one found will be returned.
+.INDENT 7.0
+.INDENT 3.5
+Can be enabled by \fBLP_ENABLE_CONTAINER\fP\&.
+.UNINDENT
+.UNINDENT
+.sp
+New in version 2.1.
 
 .UNINDENT
 .INDENT 0.0
@@ -1322,6 +1447,16 @@ multiplexer. Returns a string matching the multiplexer:
 .UNINDENT
 .sp
 New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_shell_level() -> var:lp_shell_level
+Returns \fBtrue\fP if the shell is a nested shell inside another shell.
+.sp
+Can be disabled by \fBLP_ENABLE_SHLVL\fP\&.
+.sp
+New in version 2.1.
 
 .UNINDENT
 .INDENT 0.0
@@ -1431,23 +1566,16 @@ New in version 2.0.
 Returns \fBtrue\fP if a hostname should be displayed. Returns \fB1\fP if the
 connection type is local and \fBLP_HOSTNAME_ALWAYS\fP is not \fB1\fP\&.
 .sp
-Returns the hostname string.
-.sp
-\fBNOTE:\fP
-.INDENT 7.0
-.INDENT 3.5
-The returned string is not the real hostname, instead it is the shell
-escape code for hostname, so the shell will substitute the real user ID
-when it evaluates \fBPS1\fP\&.
-.UNINDENT
-.UNINDENT
-.sp
-Deprecated since version 2.0: Also sets \fBLP_HOST_SYMBOL\fP to the same return string.
-
+Returns the hostname string in \fIlp_hostname\fP\&.
 .sp
 Can be disabled by \fBLP_HOSTNAME_ALWAYS\fP set to \fB\-1\fP\&.
 .sp
 New in version 2.0.
+
+.sp
+Changed in version 2.1: Returns the actual hostname instead of a shell prompt escape code.
+No longer sets \fBLP_HOST_SYMBOL\fP to the same return string.
+Added \fBLP_HOSTNAME_METHOD\fP to configure display method.
 
 .UNINDENT
 .INDENT 0.0
@@ -1460,6 +1588,10 @@ password, this will always return \fBtrue\fP\&.
 Can be disabled by \fBLP_ENABLE_SUDO\fP\&.
 .sp
 New in version 2.0.
+
+.sp
+Changed in version 2.1: If the user has NOPASSWD powers, that is cached on startup to prevent
+multiple \fBsudo\fP calls.
 
 .UNINDENT
 .INDENT 0.0
@@ -1484,20 +1616,14 @@ New in version 2.0.
 Returns \fBtrue\fP if a username should be displayed. Returns \fB1\fP if the
 user is the login user and \fBLP_USER_ALWAYS\fP is not \fB1\fP\&.
 .sp
-Returns the current user ID.
-.sp
-\fBNOTE:\fP
-.INDENT 7.0
-.INDENT 3.5
-The returned string is not a real user ID, instead it is the shell escape
-code for user, so the shell will substitute the real user ID when it
-evaluates \fBPS1\fP\&.
-.UNINDENT
-.UNINDENT
+Returns the current user ID in \fIlp_username\fP\&.
 .sp
 Can be disabled by \fBLP_USER_ALWAYS\fP set to \fB\-1\fP\&.
 .sp
 New in version 2.0.
+
+.sp
+Changed in version 2.1: Returns the actual username instead of a shell prompt escape code.
 
 .UNINDENT
 .SS Path
@@ -1505,9 +1631,10 @@ New in version 2.0.
 .TP
 .B _lp_path_format(path_format=$LP_COLOR_PATH, last_directory_format=$path_format, vcs_root_format=$last_directory_format, shortened_directory_format=$path_format, separator="/"[, separator_format]) -> var:lp_path, var:lp_path_format
 Returns a shortened and formatted string indicating the current working
-directory path. \fIlp_path\fP contains the path without any formatting or custom
-separators, intended for use in the terminal title. \fIlp_path_format\fP contains
-the complete formatted path, to be inserted into the prompt.
+directory path. \fIlp_path\fP contains the path without any formatting, custom
+separators, or shell escapes, intended for use in the terminal title.
+\fIlp_path_format\fP contains the complete formatted path, to be inserted into
+the prompt.
 .sp
 The behavior of the shortening is controlled by
 \fBLP_ENABLE_SHORTEN_PATH\fP, \fBLP_PATH_METHOD\fP,
@@ -1536,6 +1663,9 @@ formatted with \fIseparator_format\fP\&. Note that the root directory is treated
 a directory, and is formatted as such.
 .sp
 New in version 2.0.
+
+.sp
+Changed in version 2.1: Changed \fIlp_path\fP to no longer contain shell escapes.
 
 .UNINDENT
 .SS Runtime
@@ -1578,21 +1708,15 @@ New in version 2.0: Note that a function by this name was renamed to
 .TP
 .B _lp_time() -> var:lp_time
 Returns \fBtrue\fP if digital time is enabled. Returns the current digital time
-string.
+string, formatting set by \fBLP_TIME_FORMAT\fP\&.
 .sp
-\fBNOTE:\fP
-.INDENT 7.0
-.INDENT 3.5
-The returned string is not the real time, instead it is the shell escape
-code for time, so the shell will substitute the real current time when it
-evaluates \fBPS1\fP\&.
-.UNINDENT
-.UNINDENT
-.sp
-Can be disabled by \fBLP_ENABLE_TIME\fP or \fBLP_TIME_ANALOG\fP set to
+Can be disabled by \fBLP_ENABLE_TIME\fP, or \fBLP_TIME_ANALOG\fP set to
 \fB1\fP\&.
 .sp
 New in version 2.0.
+
+.sp
+Changed in version 2.1: Returns the actual time instead of a shell prompt escape code.
 
 .UNINDENT
 .INDENT 0.0
@@ -1601,10 +1725,30 @@ New in version 2.0.
 Returns \fBtrue\fP if analog time is enabled. Returns the current analog time
 as a single Unicode character, accurate to the closest 30 minutes.
 .sp
-Can be disabled by \fBLP_ENABLE_TIME\fP or \fBLP_TIME_ANALOG\fP set to
+Can be disabled by \fBLP_ENABLE_TIME\fP, or \fBLP_TIME_ANALOG\fP set to
 \fB0\fP\&.
 .sp
 New in version 2.0.
+
+.UNINDENT
+.SS Wireless
+.INDENT 0.0
+.TP
+.B _lp_wifi_signal_strength() -> var:lp_wifi_signal_strength
+Returns \fBtrue\fP if the lowest wireless signal strength is lower than the
+threshold. Returns the lowest strength percentage.
+.sp
+If the threshold is not surpassed, the lowest signal strength is still
+returned.
+.sp
+If no wireless signal data is found, returns \fBfalse\fP and
+\fIlp_wifi_signal_strength\fP will not be set.
+.sp
+The threshold is configured with \fBLP_WIFI_STRENGTH_THRESHOLD\fP\&.
+.sp
+Can be disabled by \fBLP_ENABLE_WIFI_STRENGTH\fP\&.
+.sp
+New in version 2.1.
 
 .UNINDENT
 .SH DEFAULT THEME FUNCTIONS
@@ -1726,6 +1870,14 @@ New in version 2.0.
 .UNINDENT
 .INDENT 0.0
 .TP
+.B _lp_aws_profile_color() -> var:lp_aws_profile_color
+Returns \fB_lp_aws_profile()\fP with color from \fBLP_COLOR_AWS_PROFILE\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
 .B _lp_battery_color() -> var:lp_battery_color
 Returns data from \fB_lp_battery()\fP, colored with:
 .INDENT 7.0
@@ -1753,6 +1905,16 @@ Adds battery value if \fBLP_PERCENTS_ALWAYS\fP is \fB1\fP\&.
 .sp
 Changed in version 2.0: Return code matches data function.
 Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_container_color() -> var:_lp_container_color
+Returns \fB_lp_container()\fP, surrounded by « and »
+colored with \fBLP_COLOR_CONTAINER\fP if the value is true.
+Returns no data if the value is false.
+.sp
+New in version 2.1.
 
 .UNINDENT
 .INDENT 0.0
@@ -1813,6 +1975,15 @@ Return method changed from stdout.
 .UNINDENT
 .INDENT 0.0
 .TP
+.B _lp_kubernetes_context_color() -> var:lp_kubernetes_context_color
+Returns data from \fB_lp_kubernetes_context()\fP, colored with
+\fBLP_COLOR_KUBECONTEXT\fP and using mark \fBLP_MARK_KUBECONTEXT\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
 .B _lp_load_color() -> var:lp_load_color
 Returns \fB_lp_load()\fP with color from \fBLP_COLORMAP\fP and mark from
 \fBLP_MARK_LOAD\fP\&.
@@ -1825,10 +1996,26 @@ Return method changed from stdout.
 .UNINDENT
 .INDENT 0.0
 .TP
+.B _lp_node_env_color() -> var:lp_node_env_color
+Returns \fB_lp_node_env()\fP with color from \fBLP_COLOR_NODE_VENV\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
 .B _lp_python_env_color() -> var:lp_python_env_color
 Returns \fB_lp_python_env()\fP with color from \fBLP_COLOR_VIRTUALENV\fP\&.
 .sp
 New in version 2.0.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_ruby_env_color() -> var:lp_ruby_env_color
+Returns \fB_lp_ruby_env()\fP with color from \fBLP_COLOR_RUBY_VENV\fP\&.
+.sp
+New in version 2.1.
 
 .UNINDENT
 .INDENT 0.0
@@ -1839,6 +2026,15 @@ Returns \fB_lp_runtime_format()\fP with color from \fBLP_COLOR_RUNTIME\fP\&.
 Changed in version 2.0: Renamed from \fB_lp_runtime\fP\&.
 Return code matches data function.
 Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_shell_level_color() -> var:lp_shell_level_color
+Returns \fB_lp_shell_level()\fP, prefixed with \fBLP_MARK_SHLVL\fP, all
+colored with \fBLP_COLOR_SHLVL\fP\&.
+.sp
+New in version 2.1.
 
 .UNINDENT
 .INDENT 0.0
@@ -1874,6 +2070,14 @@ from \fBLP_MARK_TEMP\fP\&.
 Changed in version 2.0: Renamed from \fB_lp_temperature\fP\&.
 Return code matches data function.
 Return method changed from stdout.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_terraform_env_color() -> var:lp_terraform_env_color
+Returns \fB_lp_terraform_env()\fP with color from \fBLP_COLOR_TERRAFORM\fP\&.
+.sp
+New in version 2.1.
 
 .UNINDENT
 .INDENT 0.0
@@ -1917,12 +2121,24 @@ The return code is undefined; a string should always be returned.
 New in version 2.0.
 
 .UNINDENT
+.INDENT 0.0
+.TP
+.B _lp_wifi_signal_strength_color() -> var:lp_wifi_signal_strength_color
+Returns \fB_lp_wifi_signal_strength()\fP with color from \fBLP_COLORMAP\fP
+and mark from \fBLP_MARK_WIFI\fP\&.
+.sp
+New in version 2.1.
+
+.UNINDENT
 .SH UTILITY FUNCTIONS
 .sp
 These functions are designed to be used by themes.
 .INDENT 0.0
 .TP
 .B _lp_as_text(string) -> stdout
+Deprecated since version 2.1: Use \fB__lp_strip_escapes()\fP instead.
+
+.sp
 Return \fIstring\fP with all shell escaped substrings removed.
 .UNINDENT
 .INDENT 0.0
@@ -1976,22 +2192,29 @@ on the right.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B _lp_smart_mark([vcs_type]) -> var:lp_smart_mark
+.B _lp_smart_mark([vcs_type][, vcs_subtype]) -> var:lp_smart_mark
 Returns a string set to the configured mark matching \fIvcs_type\fP\&. If
 \fIvcs_type\fP is not set, uses the value of \fBlp_vcs_type\fP instead.
 .sp
-If the type is "git", extra checks are done to see if the repository is of
-type VCSH or git\-svn instead, and return their marks if so.
+If the type is "git", matches \fIvcs_subtype\fP to see if the repository is of
+type VCSH or git\-svn instead, and return their marks if so. If \fIvcs_subtype\fP
+is not set, uses the value of \fBlp_vcs_subtype\fP instead.
+.sp
+Changed in version 2.1: Added \fIvcs_subtype\fP argument.
+
 .UNINDENT
 .INDENT 0.0
 .TP
 .B _lp_title(title) -> stdout
+Not to be confused with \fBlp_title()\fP\&.
+.sp
 Deprecated since version 2.0: Use \fI\%_lp_formatted_title\fP instead.
 
 .sp
 Formats \fItitle\fP with title escape codes. The input is escaped using
-\fI\%_lp_as_text()\fP to strip terminal formatting from being added to the
-title. The output should be added to \fBPS1\fP to be printed as a title.
+\fB__lp_strip_escapes()\fP to strip terminal formatting from being added to
+the title. The output should be added to \fBPS1\fP to be printed as a
+title.
 .sp
 This function will do nothing if \fBLP_ENABLE_TITLE\fP is disabled.
 .UNINDENT
@@ -1999,8 +2222,8 @@ This function will do nothing if \fBLP_ENABLE_TITLE\fP is disabled.
 .TP
 .B _lp_formatted_title(title)
 Sets the theme generated title to \fItitle\fP\&. The input is escaped using
-\fI\%_lp_as_text()\fP to strip terminal formatting from being added to the
-title.
+\fB__lp_strip_escapes()\fP to strip terminal formatting from being added to
+the title.
 .sp
 This function will do nothing and return \fB2\fP if \fBLP_ENABLE_TITLE\fP
 is disabled.
@@ -2012,8 +2235,8 @@ New in version 2.0.
 .TP
 .B _lp_raw_title(title)
 Sets the theme generated title to \fItitle\fP\&. The input is not escaped in any
-way: if the input contains terminal formatting, use \fI\%_lp_title()\fP
-instead.
+way: if the input contains terminal formatting, use
+\fI\%_lp_formatted_title()\fP instead.
 .sp
 This function will do nothing and return \fB2\fP if \fBLP_ENABLE_TITLE\fP
 is disabled.
@@ -2027,6 +2250,8 @@ New in version 2.0.
 \fI\%Config\fP
 .IP \(bu 2
 \fI\%Formatting\fP
+.IP \(bu 2
+\fI\%Battery\fP
 .IP \(bu 2
 \fI\%Git\fP
 .IP \(bu 2
@@ -2042,9 +2267,13 @@ New in version 2.0.
 .IP \(bu 2
 \fI\%Theme\fP
 .IP \(bu 2
+\fI\%Title\fP
+.IP \(bu 2
 \fI\%Temperature\fP
 .IP \(bu 2
 \fI\%Utility\fP
+.IP \(bu 2
+\fI\%Wireless\fP
 .UNINDENT
 .sp
 These functions are designed to be used only by Liquidprompt internals and data
@@ -2093,6 +2322,28 @@ New in version 1.12.
 
 .sp
 Changed in version 2.0: Renamed from \fBforeground_color\fP\&.
+
+.UNINDENT
+.SS Battery
+.INDENT 0.0
+.TP
+.B __lp_battery_acpi() -> var:lp_battery, var:lp_battery_status
+Returns the status and remaining capacity of the battery, as reported by
+the \fIacpi\fP tool. This function is available only on Linux, and requires
+\fIacpi\fP to be installed.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_battery_sysfs() -> var:lp_battery, var:lp_battery_status
+Returns the status and remaining capacity of the battery, using \fIsysfs\fP\&.
+This is the default method. If multiple batteries are present, returns the
+status of the first battery found. This function is available only on Linux
+systems.
+.sp
+New in version 2.1.
 
 .UNINDENT
 .SS Git
@@ -2207,6 +2458,15 @@ Optional parameter \fIpath\fP added.
 .SS Prompt
 .INDENT 0.0
 .TP
+.B __lp_before_command()
+Used only by Bash to hack the DEBUG trap to run functions before the user
+command executes.
+.sp
+Changed in version 2.1: Renamed from the Bash version of \fB__lp_runtime_before\fP\&.
+
+.UNINDENT
+.INDENT 0.0
+.TP
 .B __lp_set_prompt()
 Setup features that need to be handled outside of the themes, like
 \fB_lp_error()\fP (since last return code must be recorded first), non
@@ -2230,8 +2490,9 @@ Changed in version 2.0: Renamed from \fB_lp_runtime_before\fP\&.
 .INDENT 0.0
 .TP
 .B __lp_runtime_after()
-Hooks into the shell to run directly after the user command returns, to
-record the current time, and calculate how long the command ran for.
+Called by \fI\%__lp_set_prompt()\fP to run directly after the user command
+returns, to record the current time and calculate how long the command ran
+for.
 .sp
 Changed in version 2.0: Renamed from \fB_lp_runtime_after\fP\&.
 
@@ -2264,6 +2525,24 @@ Uses \fI\%__lp_theme_list()\fP to provide Zsh autocompletion for
 New in version 2.0.
 
 .UNINDENT
+.SS Title
+.INDENT 0.0
+.TP
+.B __lp_get_last_command_line() -> var:command
+Returns the whole command line most recently submitted by the user.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_print_title_command()
+Sets the terminal title to the normal set title, postpended with the
+currently running command.
+.sp
+New in version 2.1.
+
+.UNINDENT
 .SS Temperature
 .INDENT 0.0
 .TP
@@ -2273,6 +2552,9 @@ that works correctly. When one correctly returns a value, it is saved to
 \fB_LP_TEMP_FUNCTION\fP for use by \fB_lp_temperature()\fP\&.
 .sp
 Changed in version 2.0: Renamed from \fB_lp_temp_detect\fP\&.
+
+.sp
+Changed in version 2.1: No longer takes arguments of what backends to try.
 
 .UNINDENT
 .INDENT 0.0
@@ -2291,6 +2573,14 @@ A temperature backend using lm\-sensors provided \fBsensors\fP\&.
 .sp
 Changed in version 2.0: Renamed from \fB_lp_temp_sensors\fP\&.
 Return variable changed from \fBtemperature\fP\&.
+
+.UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_temp_sysfs() -> var:lp_temperature
+A temperature backend reading directly from the Linux sysfs filesystem.
+.sp
+New in version 2.1.
 
 .UNINDENT
 .SS Utility
@@ -2338,7 +2628,29 @@ replacement for \fBwc \-l\fP\&.
 New in version 2.0.
 
 .UNINDENT
+.INDENT 0.0
+.TP
+.B __lp_strip_escapes(string) -> var:ret
+Remove shell escape characters so \fIstring\fP prints correctly in a terminal
+title, or can be measured for printing character length.
+.sp
+New in version 2.1.
+
+.UNINDENT
+.SS Wireless
+.INDENT 0.0
+.TP
+.B __lp_wifi_signal_strength_raw() -> var:level
+Returns the lowest raw wireless signal strength in dBm. Return \fB2\fP if no
+data is found.
+.sp
+Implementation depends on operating system. This function does not exist on
+all operating systems.
+.sp
+New in version 2.1.
+
+.UNINDENT
 .SH COPYRIGHT
-2011-2021, Liquidprompt team
+2011-2022, Liquidprompt team
 .\" Generated by docutils manpage writer.
 .

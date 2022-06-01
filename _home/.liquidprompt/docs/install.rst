@@ -38,8 +38,8 @@ following line in your ``.zshrc`` after activating Antigen::
 Installation via Zinit
 ----------------------
 
-To install via `Zinit <https://github.com/zdharma/zinit>`_, simply add the
-following lines in your ``.zshrc`` after activating Zinit::
+To install via `Zinit <https://github.com/zdharma-continuum/zinit>`_, simply
+add the following lines in your ``.zshrc`` after activating Zinit::
 
     zinit ice ver"stable" lucid nocd
     zinit light nojhan/liquidprompt
@@ -56,16 +56,14 @@ systems:
    * ``ps``
    * ``sed``
    * ``uname``
-   * ``who``
 
 Some features depend on specific commands. If you do not install them, the
 corresponding feature will not be available, but no error will be displayed. See
 the :doc:`config` for more information about available features and what tools
 they require.
 
-   * Battery status requires ``acpi`` on GNU/Linux.
-   * Temperature status requires ``acpi`` or ``sensors`` on GNU/Linux.
    * Terminal formatting requires ``tput``.
+   * Time display requires ``date``.
    * Detached session status looks for ``screen`` and/or ``tmux``.
    * VCS support features require ``git``, ``hg``, ``svn``, ``bzr`` or
      ``fossil`` for their respective repositories.
@@ -100,5 +98,15 @@ Adjust the path if you installed to a different location that the suggested
    add-on that sets it, make sure to set :envvar:`PROMPT_COMMAND` **before** you
    source Liquidprompt to avoid history and timing issues. Do not export
    :envvar:`PROMPT_COMMAND`.
+
+.. warning::
+   If you are using `bash-preexec <https://github.com/rcaloras/bash-preexec>`_, be
+   aware that bash-preexec **must** come **before** liquidprompt in your
+   ``.bashrc``. This
+   contradicts their documentation, which says `"[bash-preexec] must be the last
+   thing imported in your bash profile"
+   <https://github.com/rcaloras/bash-preexec/blob/master/README.md#install>`_,
+   but since Liquid Prompt special-cases bash-preexec, it must be loaded after
+   bash-preexec.
 
 Next up are the :doc:`config`.

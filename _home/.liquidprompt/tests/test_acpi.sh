@@ -9,6 +9,7 @@ uname() { printf 'Linux'; }
 unset -f uname
 
 LP_ENABLE_BATT=1
+_LP_BATTERY_FUNCTION=__lp_battery_acpi
 
 typeset -a battery_outputs battery_statuses battery_values temp_outputs temp_values
 
@@ -35,6 +36,19 @@ temp_outputs+=(
 "Thermal 0: ok, -267.8 degrees C"
 )
 temp_values+=(-267)
+
+# Multiple batteries
+battery_outputs+=(
+"Battery 0: Discharging, 5%, rate information unavailable
+Battery 1: Discharging, 0%, rate information unavailable
+Battery 2: Discharging, 53%, 02:35:00 remaining"
+)
+battery_statuses+=(0)
+battery_values+=(5)
+temp_outputs+=(
+"Thermal 0: ok, 39.0 degrees C"
+)
+temp_values+=(39)
 
 # VPS at OVH
 temp_outputs+=(
@@ -69,11 +83,14 @@ function test_acpi_battery {
 function test_acpi_temperature {
 
   LP_ENABLE_TEMP=1
+  _LP_LINUX_TEMPERATURE_FILES=("")
   LP_TEMP_THRESHOLD=-1000000
 
   acpi() {
     printf '%s\n' "$__temp_output"
   }
+  # Stub needed to test acpi with no output.
+  sensors() { :; }
 
   local valid
 
@@ -89,14 +106,17 @@ function test_acpi_temperature {
       valid=1
     fi
 
-    __lp_temp_detect acpi
+    __lp_temp_detect
     assertEquals "ACPI temperature detect at index ${index}" "$valid" "$?"
 
     # Set the temp function in case the above detect said it was invalid.
     # While we should never be in this situation, might as well make sure
     # it doesn't crash.
     _LP_TEMP_FUNCTION=__lp_temp_acpi
-    unset lp_temperature
+
+    # This is to test that _lp_temperature() ignores previous high values
+    lp_temperature=10000
+
     _lp_temperature
     assertEquals "ACPI temperature return at index ${index}" "$valid" "$?"
     assertEquals "ACPI temperature return output at index ${index}" "${temp_values[$index]}" "${lp_temperature-}"
