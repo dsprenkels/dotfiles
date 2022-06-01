@@ -79,5 +79,5 @@ fi
 
 if [[ $(hostname 2>/dev/null) == shaggydog ]]; then
 	LD_LIBRARY_PATH="$HOME/jasmin-dilithium/dilithium/ref:$LD_LIBRARY_PATH"
-	[[ ! -v IN_NIX_SHELL ]] && nix-shell && exit
+	[[ ! -v IN_NIX_SHELL ]] && nix-shell "$HOME/shell.nix" && exit
 fi
