@@ -77,6 +77,7 @@ if [[ $(hostname 2>/dev/null) == suyin-arch ]]; then
 	PATH="$PATH:/opt/devkitpro/devkitARM/bin:/opt/devkitpro/tools/bin"
 fi
 
+# automatically enter a nix-shell on shaggydog
 if [[ $(hostname 2>/dev/null) == shaggydog ]]; then
 	LD_LIBRARY_PATH="$HOME/jasmin-dilithium/dilithium/ref:$LD_LIBRARY_PATH"
 	[[ ! -v IN_NIX_SHELL ]] && nix-shell "$HOME/shell.nix" && exit
