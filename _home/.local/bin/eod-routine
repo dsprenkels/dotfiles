@@ -2,6 +2,7 @@
 
 suki="suki"
 helikon="helikon"
+shaggydog="shaggydog"
 subvolumes=("/home" "/etc" "/var" "/usr/local")
 hostname="$(hostname)"	
 
@@ -26,6 +27,13 @@ echo
 
 echo >&2 "Backing up mail"
 mbsync --all
+
+if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
+	echo >&2 "Backing up shaggydog work"
+	for dir in "jasmin-dilithium" "jasmin"; do
+		rsync -ravuzzh --delete "$shaggydog:/home/dsprenkels/${dir}" "/home/daan/Documents/PhD/backup_slave/"
+	done
+fi
 
 echo >&2 "Performing backups"
 for dir in "Documents" ".config" "SynologyDrive" "SynologyTeamDrive"; do
