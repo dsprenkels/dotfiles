@@ -31,13 +31,13 @@ mbsync --all
 if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
 	echo >&2 "Backing up shaggydog work"
 	for dir in "jasmin-dilithium" "jasmin"; do
-		rsync -ravuzzh --delete "$shaggydog:/home/dsprenkels/${dir}" "/home/daan/Documents/PhD/backup_slave/"
+		rsync -ravuzzh --delete "$shaggydog:/home/dsprenkels/${dir}" "/home/daan/Documents/PhD/backup_replica/"
 	done
 fi
 
 echo >&2 "Performing backups"
 for dir in "Documents" ".config" "SynologyDrive" "SynologyTeamDrive"; do
-	rsync -ravuzzh --delete "$(realpath "/home/daan/${dir}")/" "$suki:/volume1/backup_slave/${hostname}/${dir}/"
+	rsync -ravuzzh --delete "$(realpath "/home/daan/${dir}")/" "$suki:/volume1/backup_replica/${hostname}/${dir}/"
 done
 for dir in "Documents" "Pictures" "Videos" "Games" ".factorio" ".config"; do
 	rsync -ravuzh --delete "$(realpath "/home/daan/${dir}")/" "$helikon:/volume1/homes/daan/katarastorage/private/backup/${hostname}_backup/${dir}/"
