@@ -40,7 +40,7 @@ for dir in "Documents" ".config" "SynologyDrive" "SynologyTeamDrive"; do
 	rsync -ravuzzh --delete "$(realpath "/home/daan/${dir}")/" "$suki:/volume1/backup_replica/${hostname}/${dir}/"
 done
 for dir in "Documents" "Pictures" "Videos" "Games" ".factorio" ".config"; do
-	rsync -ravuzh --delete "$(realpath "/home/daan/${dir}")/" "$helikon:/volume1/homes/daan/katarastorage/private/backup/${hostname}_backup/${dir}/"
+	rsync -ravuzh --delete "$(realpath "/home/daan/${dir}")/" "$helikon:/volume1/homes/amber/katarastorage/private/backup/${hostname}_backup/${dir}/"
 done
 
 exit 0
