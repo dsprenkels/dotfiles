@@ -16,11 +16,11 @@ Path /home/daan/Documents/Vault/fastmail/
 Inbox /home/daan/Documents/Vault/fastmail/Inbox
 
 Channel fastmail
-Master :fastmail-remote:
-Slave :fastmail-local:
+Far :fastmail-remote:
+Near :fastmail-local:
 Patterns *
 Sync Pull
-Create Slave
+Create Near
 Remove None
 Expunge None
 SyncState *
