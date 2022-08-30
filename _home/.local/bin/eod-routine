@@ -30,7 +30,7 @@ mbsync --all
 
 if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
 	echo >&2 "Backing up shaggydog work"
-	for dir in "jasmin-dilithium" "jasmin"; do
+	for dir in "jasmin-dilithium" "jasmin" "libjade"; do
 		rsync -ravuzzh --delete "$shaggydog:/home/dsprenkels/${dir}" "/home/daan/Documents/PhD/backup_replica/"
 	done
 fi
