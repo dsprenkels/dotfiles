@@ -15,5 +15,5 @@ for file in "$@"; do
     stubname="$(echo "${file// /_}" | tr -cd '[:alnum:]\\/._-')"
     scp "$file" "$hostname:filedrop/$randdir/$stubname"
     ssh "$hostname" "chmod a+r \"filedrop/$randdir/$stubname\""
-    echo >&2 "https://ds7s.nl/filedrop/$randdir/$(basename "$stubname")"
+    echo >&2 "https://as8.nl/filedrop/$randdir/$(basename "$stubname")"
 done
