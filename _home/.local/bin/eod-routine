@@ -36,10 +36,12 @@ if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
 fi
 
 echo >&2 "Performing backups"
-for dir in "Documents" ".config"; do
-	echo >&2 "Backing up $dir to suki"
-	rsync -ravuzzh --delete "$(realpath "/home/daan/${dir}")/" "$suki:/volume1/backup_replica/${hostname}/${dir}/"
-done
+if [[ $(hostname 2>/dev/null) = aang ]]; then
+	for dir in "Documents" ".config"; do
+		echo >&2 "Backing up $dir to suki"
+		rsync -ravuzzh --delete "$(realpath "/home/daan/${dir}")/" "$suki:/volume1/backup_replica/${hostname}/${dir}/"
+	done
+fi
 for dir in "Documents" "Pictures" "Videos" "Games" ".factorio" ".config"; do
 	echo >&2 "Backing up $dir to helikon"
 	rsync -ravuzh --delete "$(realpath "/home/daan/${dir}")/" "$helikon:/volume1/homes/amber/katarastorage/private/backup/${hostname}_backup/${dir}/"
