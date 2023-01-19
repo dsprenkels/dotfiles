@@ -6,11 +6,17 @@ set -e
 
 readonly hostname=suki
 
+# How long do we want to retain these files?
+read -rp "retention time [90 days]:" retention_time
+retention_time=${retention_time:-"90 days"}
+expiry_date="$(date --iso-8601 --utc --date "+$retention_time")"
+
+# Upload the files to a random directory
 randdir=
 while [[ $randdir == '' || $randdir == */* || $randdir == *-* ]]; do
     randdir="$(openssl rand -base64 10 | head -c 14 | sed -e 's/+/-/' -e 's/\//_/')"
 done
-ssh "$hostname" "mkdir \"filedrop/$randdir\""
+ssh "$hostname" "mkdir 'filedrop/$randdir' && echo '$expiry_date' >'filedrop/$randdir/expiry.txt'"
 for file in "$@"; do
     stubname="$(echo "${file// /_}" | tr -cd '[:alnum:]\\/._-')"
     scp "$file" "$hostname:filedrop/$randdir/$stubname"
