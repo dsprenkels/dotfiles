@@ -25,5 +25,5 @@ if [ "${HOST}" = "local" ]; then
     cp --verbose -r "$AUTORCDIR/." "$HOME"
 else
     ssh "$HOST" -- rm --verbose -rf "\$HOME/.liquidprompt"
-    rsync -ravuh "$AUTORCDIR/." "$HOST:"
+    rsync -ravh "$AUTORCDIR/." "$HOST:"
 fi
