@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ $EOD_ROUTINE_INHIBIT != 1 ]]; then
+	export EOD_ROUTINE_INHIBIT=1
+	exec systemd-inhibit --who="eod-routine" --why="backing up data" "$0" "$@"
+fi
+
 suki="suki"
 helikon="helikon"
 shaggydog="shaggydog"
