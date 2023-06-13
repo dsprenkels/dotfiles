@@ -6,7 +6,7 @@ if [[ $EOD_ROUTINE_INHIBIT != 1 ]]; then
 fi
 
 suki="suki"
-helikon="zuu.re"
+helikon="helikon"
 helikon_port="10622"
 shaggydog="shaggydog"
 lavendel="lavendel"
