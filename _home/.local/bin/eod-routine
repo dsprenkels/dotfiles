@@ -7,6 +7,7 @@ fi
 
 suki="suki"
 helikon="zuu.re"
+helikon_port="10622"
 shaggydog="shaggydog"
 lavendel="lavendel"
 subvolumes=("/home" "/etc" "/var" "/usr/local")
@@ -53,7 +54,7 @@ if [[ $(hostname 2>/dev/null) = aang ]]; then
 fi
 for dir in "Documents" "Pictures" "Videos" "Games" ".factorio" ".config"; do
 	echo >&2 "Backing up $dir to helikon"
-	rsync -ravuzh --port 10622 --delete "$(realpath "/home/daan/${dir}")/" "$helikon:/volume1/homes/amber/katarastorage/private/backup/${hostname}_backup/${dir}/"
+	rsync -ravuzh --port "$helikon_port" --delete "$(realpath "/home/daan/${dir}")/" "$helikon:/volume1/homes/amber/katarastorage/private/backup/${hostname}_backup/${dir}/"
 done
 
 exit 0
