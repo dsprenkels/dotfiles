@@ -76,3 +76,6 @@ fi
 if [[ $(hostname 2>/dev/null) == suyin-arch ]]; then
 	PATH="$PATH:/opt/devkitpro/devkitARM/bin:/opt/devkitpro/tools/bin"
 fi
+
+# just set RUST_BACKTRACE=1 by default
+export RUST_BACKTRACE=1
