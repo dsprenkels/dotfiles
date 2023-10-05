@@ -14,6 +14,10 @@ subvolumes=("/home" "/etc" "/var" "/usr/local")
 hostname="$(hostname)"	
 timeout="5"
 
+if [[ "$(hostname)" == "aang" ]]; then
+	paccache -r -k 2
+fi
+
 if [[ "$(hostname)" == "suyin-arch" ]]; then
 	helikon="helikon.local"
 	subvolumes=("/home/daan" "/etc" "/var" "/usr/local")
