@@ -9,5 +9,6 @@
 [core]
 	editor = vim
 	pager = bat --plain
+	autocrlf = false
 [pull]
 	rebase = false
