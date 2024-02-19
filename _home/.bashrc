@@ -55,8 +55,7 @@ if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
 fi
 
 RIPGREP="$(which rg)"
-function rg()
-{
+function rg() {
 	"$RIPGREP" --pretty "$@" | less -RFX
 }
 
@@ -79,3 +78,31 @@ fi
 
 # just set RUST_BACKTRACE=1 by default
 export RUST_BACKTRACE=1
+
+# initialize z as zoxide (if present on this machine)
+if type zoxide >/dev/null 2>/dev/null; then
+	eval "$(zoxide init bash)"
+fi
+
+# Add z as zoxide or cd
+\builtin unalias z &>/dev/null || \builtin true
+function z() {
+	if type __zoxide_z >/dev/null 2>/dev/null; then
+		__zoxide_z "$@"
+	else
+		# shellcheck disable=2164
+		cd "$@"
+	fi
+}
+function __as8_z_complete() {
+	if type __zoxide_z >/dev/null 2>/dev/null; then
+		# Use `zoxide` completions
+		__zoxide_z_complete "$@"
+	else
+		# Use `cd` completions
+		\builtin mapfile -t COMPREPLY < <(
+			\builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
+		)
+	fi
+}
+\builtin complete -F __as8_z_complete -o filenames -- z
