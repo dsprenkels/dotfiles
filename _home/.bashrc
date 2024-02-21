@@ -84,7 +84,7 @@ if type zoxide >/dev/null 2>/dev/null; then
 	eval "$(zoxide init bash)"
 fi
 
-# Add z as zoxide or cd
+# add z as zoxide or cd
 \builtin unalias z &>/dev/null || \builtin true
 function z() {
 	if type __zoxide_z >/dev/null 2>/dev/null; then
@@ -96,13 +96,20 @@ function z() {
 }
 function __as8_z_complete() {
 	if type __zoxide_z >/dev/null 2>/dev/null; then
-		# Use `zoxide` completions
+		# use `zoxide` completions
 		__zoxide_z_complete "$@"
 	else
-		# Use `cd` completions
+		# use `cd` completions
 		\builtin mapfile -t COMPREPLY < <(
 			\builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
 		)
 	fi
 }
 \builtin complete -F __as8_z_complete -o filenames -- z
+
+# set an ssh-agent on aang
+if [[ $(hostname) == aang ]]; then
+	if [ -z "$SSH_CONNECTION" ]; then
+		eval "$(keychain --agents ssh --eval --quick --quiet)"
+	fi
+fi
