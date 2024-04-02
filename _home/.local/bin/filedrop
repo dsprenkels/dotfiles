@@ -22,4 +22,11 @@ for file in "$@"; do
     scp "$file" "$hostname:filedrop/$randdir/$stubname"
     ssh "$hostname" "chmod a+r \"filedrop/$randdir/$stubname\""
     echo >&2 "https://as8.nl/filedrop/$randdir/$(basename "$stubname")"
+    # If the file extension is .md then also save it as a .txt file
+    if [[ $stubname == *.md ]]; then
+        stubname_txt="${stubname%.md}.txt"
+        scp "$file" "$hostname:filedrop/$randdir/$stubname_txt"
+        ssh "$hostname" "chmod a+r \"filedrop/$randdir/$stubname_txt\""
+        echo >&2 "https://as8.nl/filedrop/$randdir/$(basename "$stubname_txt")"
+    fi
 done
