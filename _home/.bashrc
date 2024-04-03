@@ -49,10 +49,13 @@ if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
 	fi
 fi
 
-RIPGREP="$(which rg)"
-function rg() {
-	"$RIPGREP" --pretty "$@" | less -RFX
-}
+# override ripgrep with settings that fit interactive use
+if which rg >/dev/null 2>/dev/null; then
+	RIPGREP="$(which rg)"
+	function rg() {
+		"$RIPGREP" --pretty "$@" | less -RFX
+	}
+fi
 
 # preferred editor, pager on suyin-arch is vim, "bat --plain"
 # add an alias for starting factorio
@@ -62,7 +65,7 @@ if [[ $(hostname 2>/dev/null) == suyin-arch ]]; then
 fi
 
 # add an alias for `bat --plain`
-if type bat >/dev/null 2>/dev/null; then
+if type bat >/dev/null 2>/dev/null && ! type bp >/dev/null 2>/dev/null; then
 	function bp() {
 		bat --plain "$@"
 	}
