@@ -113,3 +113,9 @@ if [[ $(hostname) == aang ]]; then
 		eval "$(keychain --agents ssh --eval --quick --quiet)"
 	fi
 fi
+
+# disable gpu on aang (where muffin does not work well with intel xe)
+if [[ $(hostname) == aang ]]; then
+	export QMLSCENE_DEVICE=softwarecontext
+	export QT_OPENGL=software
+fi
