@@ -8,8 +8,6 @@ fi
 suki="suki"
 helikon="helikon"
 helikon_port="10622"
-shaggydog="shaggydog"
-lavendel="lavendel"
 subvolumes=("/home" "/etc" "/var" "/usr/local")
 hostname="$(hostname)"	
 timeout="5"
@@ -39,16 +37,6 @@ echo
 
 echo >&2 "Backing up mail"
 mbsync --all
-
-if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
-	echo >&2 "Backing up shaggydog work"
-	for dir in "jasmin-dilithium" "jasmin" "libjade"; do
-		rsync --timeout="$timeout" -ravuzzh --delete "$shaggydog:/home/dsprenkels/${dir}" "/home/daan/Documents/PhD/backup_replica/"
-	done
-	
-	echo >&2 "Backing up lavendel work"
-	rsync --timeout="$timeout" -ravuzzh --delete "$lavendel:/home/amber/timevault" "/home/daan/Documents/Code/backup_replica/"
-fi
 
 echo >&2 "Performing backups"
 if [[ $(hostname 2>/dev/null) = aang ]]; then
