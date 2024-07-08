@@ -22,7 +22,7 @@ alias egrep='egrep --color=auto'
 [[ $- = *i* ]] && source ~/.liquidprompt/liquidprompt
 
 # set gopath
-if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	export GOPATH="$HOME/.cache/go"
 	export PATH="$PATH:/usr/lib/go-1.6/bin:$GOPATH/bin"
 	# [2020-05-08] Fix for being able to compile the Go standard library.
@@ -30,20 +30,20 @@ if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
 fi
 
 # set ruby path
-if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
-	export PATH="$PATH:/home/daan/.gem/ruby/3.0.0/bin"
+if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
+	export PATH="$PATH:$HOME/.gem/ruby/3.0.0/bin"
 fi
 
 # set additional local search path
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 # set password store directory
-if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	export PASSWORD_STORE_DIR=~/Documents/Vault/password-store
 fi
 
 # use keychain if we're on aang/suyin-arch and we are logged in via SSH
-if [[ $(hostname 2>/dev/null) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	if [ -n "$SSH_CONNECTION" ]; then
 		eval "$(keychain --eval --quiet)"
 	fi
@@ -59,7 +59,7 @@ fi
 
 # preferred editor, pager on suyin-arch is vim, "bat --plain"
 # add an alias for starting factorio
-if [[ $(hostname 2>/dev/null) == suyin-arch ]]; then
+if [[ $(hostnamectl hostname) == suyin-arch ]]; then
 	export EDITOR="vim"
 	export PAGER="less"
 fi
@@ -72,7 +72,7 @@ if type bat >/dev/null 2>/dev/null && ! type bp >/dev/null 2>/dev/null; then
 fi
 
 # add devkitpro tools to path
-if [[ $(hostname 2>/dev/null) == suyin-arch ]]; then
+if [[ $(hostnamectl hostname) == suyin-arch ]]; then
 	PATH="$PATH:/opt/devkitpro/devkitARM/bin:/opt/devkitpro/tools/bin"
 fi
 
@@ -108,14 +108,14 @@ function __as8_z_complete() {
 \builtin complete -F __as8_z_complete -o filenames -- z
 
 # set an ssh-agent on aang
-if [[ $(hostname) == aang ]]; then
+if [[ $(hostnamectl hostname) == aang ]]; then
 	if [ -z "$SSH_CONNECTION" ]; then
 		eval "$(keychain --agents ssh --eval --quick --quiet)"
 	fi
 fi
 
 # disable gpu on aang (where muffin does not work well with intel xe)
-if [[ $(hostname) == aang ]]; then
+if [[ $(hostnamectl hostname) == aang ]]; then
 	export QMLSCENE_DEVICE=softwarecontext
 	export QT_OPENGL=software
 fi
