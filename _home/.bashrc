@@ -17,7 +17,6 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # liquidprompt settings
-export LP_HOSTNAME_METHOD=pretty
 # shellcheck source=.liquidprompt
 # shellcheck disable=SC1091
 [[ $- = *i* ]] && source ~/.liquidprompt
