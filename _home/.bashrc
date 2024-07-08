@@ -17,9 +17,10 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # liquidprompt settings
-# shellcheck source=.liquidprompt/liquidprompt
+export LP_HOSTNAME_METHOD=pretty
+# shellcheck source=.liquidprompt
 # shellcheck disable=SC1091
-[[ $- = *i* ]] && source ~/.liquidprompt/liquidprompt
+[[ $- = *i* ]] && source ~/.liquidprompt
 
 # set gopath
 if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
