@@ -9,16 +9,16 @@ suki="suki"
 helikon="helikon"
 helikon_port="10622"
 subvolumes=("/home" "/etc" "/var" "/usr/local")
-hostname="$(hostname)"	
+hostname="$(hostnamectl hostname)"	
 timeout="5"
 
-if [[ "$(hostname)" == "aang" ]]; then
+if [[ "$hostname" == "aang" ]]; then
 	paccache -r -k 2
 fi
 
-if [[ "$(hostname)" == "suyin-arch" ]]; then
+if [[ "$hostname" == "suyin-arch" ]]; then
 	helikon="helikon.local"
-	subvolumes=("/home/daan" "/etc" "/var" "/usr/local")
+	subvolumes=("$HOME" "/etc" "/var" "/usr/local")
 fi
 
 echo >&2 "Saving package list"
@@ -42,12 +42,12 @@ echo >&2 "Performing backups"
 if [[ $(hostname 2>/dev/null) = aang ]]; then
 	for dir in "Documents" ".config"; do
 		echo >&2 "Backing up $dir to suki"
-		rsync --timeout="$timeout" -ravuzzh --delete "$(realpath "/home/daan/${dir}")/" "$suki:/volume1/backup_replica/${hostname}/${dir}/"
+		rsync --timeout="$timeout" -ravuzzh --delete "$(realpath "$HOME/${dir}")/" "$suki:/volume1/backup_replica/${hostname}/${dir}/"
 	done
 fi
 for dir in "Documents" "Pictures" "Videos" "Games" ".factorio" ".config"; do
 	echo >&2 "Backing up $dir to helikon"
-	rsync --timeout="$timeout" -ravuzh --rsync-path="/usr/bin/rsync" --port="$helikon_port" --delete "$(realpath "/home/daan/${dir}")/" "$helikon:/volume1/homes/amber/katarastorage/private/backup/${hostname}_backup/${dir}/"
+	rsync --timeout="$timeout" -ravuzh --rsync-path="/usr/bin/rsync" --port="$helikon_port" --delete "$(realpath "$HOME/${dir}")/" "$helikon:/volume1/homes/amber/katarastorage/private/backup/${hostname}_backup/${dir}/"
 done
 
 exit 0
