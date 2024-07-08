@@ -12,34 +12,36 @@ subvolumes=("/home" "/etc" "/var" "/usr/local")
 hostname="$(hostnamectl hostname)"	
 timeout="5"
 
-if [[ "$hostname" == "aang" ]]; then
-	paccache -r -k 2
-fi
+echo >&2 "Saving package list"
+pacman -Qe >"$HOME/Documents/Vault/${hostname}_packages.txt"
 
 if [[ "$hostname" == "suyin-arch" ]]; then
 	helikon="helikon.local"
 	subvolumes=("$HOME" "/etc" "/var" "/usr/local")
+
+	echo >&2 "Making filesystem snapshots"
+	for subvol in "${subvolumes[@]}"; do
+		saveto="/.snapshots/$(date '+%Y%m%d')$(echo "$subvol" | sed 's/\//\-/g')"
+		if [ -e "$saveto" ]; then
+			echo "$saveto already exists, skipping snapshot"
+		else
+			sudo btrfs subvolume snapshot "$subvol" "$saveto"
+		fi
+	done
 fi
 
-echo >&2 "Saving package list"
-pacman -Qe >"$HOME/Documents/Vault/$(hostname)_packages.txt"
+if [[ "$hostname" == "aang" ]]; then
+	echo >&2 "Making filesystem snapshots"
 
-echo >&2 "Making filesystem snapshot"
-for subvol in "${subvolumes[@]}"; do
-	saveto="/.snapshots/$(date '+%Y%m%d')$(echo "$subvol" | sed 's/\//\-/g')"
-	if [ -e "$saveto" ]; then
-		echo "$saveto already exists, skipping snapshot"
-	else
-		sudo btrfs subvolume snapshot "$subvol" "$saveto"
-	fi
-done
+	sudo snapper --config root create
+	sudo snapper --config home create
 echo
 
 echo >&2 "Backing up mail"
 mbsync --all
 
 echo >&2 "Performing backups"
-if [[ $(hostname 2>/dev/null) = aang ]]; then
+if [[ "$hostname" == aang ]]; then
 	for dir in "Documents" ".config"; do
 		echo >&2 "Backing up $dir to suki"
 		rsync --timeout="$timeout" -ravuzzh --delete "$(realpath "$HOME/${dir}")/" "$suki:/volume1/backup_replica/${hostname}/${dir}/"
