@@ -35,6 +35,7 @@ if [[ "$hostname" == "aang" ]]; then
 
 	sudo snapper --config root create
 	sudo snapper --config home create
+fi
 echo
 
 echo >&2 "Backing up mail"
