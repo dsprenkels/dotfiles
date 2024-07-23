@@ -385,7 +385,7 @@ LP_ENABLE_RUNTIME=1
 # Display the highest system temperature if above the threshold.
 # Type: bool
 # More information: https://liquidprompt.readthedocs.io/en/stable/config.html#LP_ENABLE_TEMP
-#LP_ENABLE_TEMP=1
+LP_ENABLE_TEMP=0
 
 # Display the currently activated `Terraform`_ workspace.
 # Type: bool
