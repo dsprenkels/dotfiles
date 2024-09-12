@@ -57,9 +57,8 @@ if which rg >/dev/null 2>/dev/null; then
 	}
 fi
 
-# preferred editor, pager on suyin-arch is vim, "bat --plain"
-# add an alias for starting factorio
-if [[ $(hostnamectl hostname) == suyin-arch ]]; then
+# preferred editor is vim, and preferred pager is less
+if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	export EDITOR="vim"
 	export PAGER="less"
 fi
