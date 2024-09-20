@@ -33,8 +33,8 @@ fi
 if [[ "$hostname" == "aang" ]]; then
 	echo >&2 "Making filesystem snapshots"
 
-	sudo snapper --verbose --config root create
-	sudo snapper --verbose --config home create
+	sudo snapper --verbose --config root create --cleanup-algorithm timeline
+	sudo snapper --verbose --config home create --cleanup-algorithm timeline
 fi
 echo
 
