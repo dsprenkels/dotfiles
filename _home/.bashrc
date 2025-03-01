@@ -10,7 +10,8 @@ HISTCONTROL=ignorespace
 
 # enable color support of ls and also add handy aliases
 alias ls='ls --color=auto'
-alias lt='ls --color=auto -lt'
+alias ll='ls --color=always -lh | less --RAW-CONTROL-CHARS --quit-if-one-screen'
+alias lt='ls --color=always -lth | less --RAW-CONTROL-CHARS --quit-if-one-screen'
 alias dir='dir --color=auto'
 alias vdir='vdir --color=auto'
 alias grep='grep --color=auto'
