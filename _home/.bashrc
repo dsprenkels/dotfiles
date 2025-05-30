@@ -111,7 +111,7 @@ function __as8_z_complete() {
 # set an ssh-agent on aang
 if [[ $(hostnamectl hostname) == aang ]]; then
 	if [ -z "$SSH_CONNECTION" ]; then
-		eval "$(keychain --agents ssh --eval --quick --quiet)"
+		eval "$(keychain --ssh-allow-gpg --eval --quick --quiet)"
 	fi
 fi
 
