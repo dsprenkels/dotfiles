@@ -23,6 +23,15 @@ alias egrep='egrep --color=auto'
 # shellcheck disable=SC1091
 [[ $- = *i* ]] && source ~/.liquidprompt
 
+# Explicitly enable bash completion
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
 # set gopath
 if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
 	export GOPATH="$HOME/.cache/go"
