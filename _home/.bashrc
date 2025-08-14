@@ -120,3 +120,8 @@ if [[ $(hostnamectl hostname) == aang ]]; then
 	export QMLSCENE_DEVICE=softwarecontext
 	export QT_OPENGL=software
 fi
+
+if [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
+	export DPRINT_INSTALL="/home/amber/.dprint"
+	export PATH="$DPRINT_INSTALL/bin:$PATH"
+fi
