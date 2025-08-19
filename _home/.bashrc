@@ -130,7 +130,23 @@ if [[ $(hostnamectl hostname) == aang ]]; then
 	export QT_OPENGL=software
 fi
 
+# add dprint to path if working on work laptop
 if [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
 	export DPRINT_INSTALL="/home/amber/.dprint"
 	export PATH="$DPRINT_INSTALL/bin:$PATH"
+fi
+
+# setup a clean-slate polars repo
+if [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
+	function polars-cleanslate() {
+		if [ -z "$1" ]; then
+			echo "Usage: polars <branch-name>"
+			return 1
+		fi
+		cd "$HOME/git/polars" || return 1
+		git fetch upstream || true
+		git worktree add -b "$1" "$HOME/git/$1" upstream/main || return 1
+		cd "$HOME/git/$1" || return 1
+		code .
+	}
 fi
