@@ -912,7 +912,7 @@ LP_TEMP_THRESHOLD=75
 # Color used to indicate the last command exited with a non-zero return code.
 # Type: string
 # More information: https://liquidprompt.readthedocs.io/en/stable/config.html#LP_COLOR_ERR
-#LP_COLOR_ERR=$PURPLE
+LP_COLOR_ERR=$PURPLE
 
 # Color of the environment variables that are set,
 # in the user-defined watch list.
