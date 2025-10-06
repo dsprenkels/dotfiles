@@ -1,6 +1,86 @@
 #!/bin/bash
 
-# If not running interactively, don't do anything
+# initialize z as zoxide (if present on this machine)
+if type zoxide >/dev/null 2>/dev/null; then
+	eval "$(zoxide init bash)"
+fi
+
+# add z as zoxide or cd
+\builtin unalias z &>/dev/null || \builtin true
+function z() {
+	if type __zoxide_z >/dev/null 2>/dev/null; then
+		__zoxide_z "$@"
+	else
+		# shellcheck disable=2164
+		cd "$@"
+	fi
+}
+function __as8_z_complete() {
+	if type __zoxide_z >/dev/null 2>/dev/null; then
+		# use `zoxide` completions
+		__zoxide_z_complete "$@"
+	else
+		# use `cd` completions
+		\builtin mapfile -t COMPREPLY < <(
+			\builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
+		)
+	fi
+}
+\builtin complete -F __as8_z_complete -o filenames -- z
+
+# interactively choose git branches to delete
+function git-branchgc() {
+    if ! command -v gum &> /dev/null; then
+        echo "gum could not be found, please install it first."
+        return 1
+    fi
+
+    if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+        echo "Not inside a git repository."
+        return 1
+    fi
+    readarray -t branches < <(git branch --format='%(refname:short)' | grep -v 'main\|master\|dev\|development\|staging\|production' | sort)
+    gum choose --no-limit --selected-prefix="✗ " "${branches[@]}"
+}
+
+# interactive git switch branch
+function git-gsb() {
+    local selected_branch
+
+    if ! command -v gum &> /dev/null; then
+        echo "gum could not be found, please install it first."
+        return 1
+    fi
+
+    if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+        echo "Not inside a git repository."
+        return 1
+    fi
+    readarray -t branches < <(git for-each-ref --format='%(color:reset)%(refname:short)' refs/heads/ | sort)
+    selected_branch=$(gum choose --no-strip-ansi "${branches[@]}")
+    if [ -n "$selected_branch" ]; then
+        git switch "$selected_branch"
+    else
+        echo "No branch selected."
+    fi
+}
+
+# preferred editor is vim, and preferred pager is less
+if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
+	export EDITOR="vim"
+	export PAGER="less"
+fi
+
+# add an alias for `bat --plain`
+if type bat >/dev/null 2>/dev/null && ! type bp >/dev/null 2>/dev/null; then
+	function bp() {
+		bat --plain "$@"
+	}
+fi
+
+# END OF NON-INTERACTIVE SECTION, START OF INTERACTIVE SECTION
+
+# If not running interactively, don't go any further
 [ -z "$PS1" ] && return
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
@@ -68,19 +148,6 @@ if which rg >/dev/null 2>/dev/null; then
 	}
 fi
 
-# preferred editor is vim, and preferred pager is less
-if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
-	export EDITOR="vim"
-	export PAGER="less"
-fi
-
-# add an alias for `bat --plain`
-if type bat >/dev/null 2>/dev/null && ! type bp >/dev/null 2>/dev/null; then
-	function bp() {
-		bat --plain "$@"
-	}
-fi
-
 # add devkitpro tools to path
 if [[ $(hostnamectl hostname) == suyin-arch ]]; then
 	PATH="$PATH:/opt/devkitpro/devkitARM/bin:/opt/devkitpro/tools/bin"
@@ -88,34 +155,6 @@ fi
 
 # just set RUST_BACKTRACE=1 by default
 export RUST_BACKTRACE=1
-
-# initialize z as zoxide (if present on this machine)
-if type zoxide >/dev/null 2>/dev/null; then
-	eval "$(zoxide init bash)"
-fi
-
-# add z as zoxide or cd
-\builtin unalias z &>/dev/null || \builtin true
-function z() {
-	if type __zoxide_z >/dev/null 2>/dev/null; then
-		__zoxide_z "$@"
-	else
-		# shellcheck disable=2164
-		cd "$@"
-	fi
-}
-function __as8_z_complete() {
-	if type __zoxide_z >/dev/null 2>/dev/null; then
-		# use `zoxide` completions
-		__zoxide_z_complete "$@"
-	else
-		# use `cd` completions
-		\builtin mapfile -t COMPREPLY < <(
-			\builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
-		)
-	fi
-}
-\builtin complete -F __as8_z_complete -o filenames -- z
 
 # set an ssh-agent on aang
 if [[ $(hostnamectl hostname) == aang ]]; then
@@ -140,40 +179,3 @@ fi
 if [[ $(which bin) ]]; then
 	export PATH="$HOME/.bin:$PATH"
 fi
-
-# interactively choose git branches to delete
-function git-branchgc() {
-    if ! command -v gum &> /dev/null; then
-        echo "gum could not be found, please install it first."
-        return 1
-    fi
-
-    if ! git rev-parse --is-inside-work-tree &> /dev/null; then
-        echo "Not inside a git repository."
-        return 1
-    fi
-    readarray -t branches < <(git branch --format='%(refname:short)' | grep -v 'main\|master\|dev\|development\|staging\|production' | sort)
-    gum choose --no-limit --selected-prefix="✗ " "${branches[@]}"
-}
-
-# interactive git switch branch
-function git-gsb() {
-    local selected_branch
-
-    if ! command -v gum &> /dev/null; then
-        echo "gum could not be found, please install it first."
-        return 1
-    fi
-
-    if ! git rev-parse --is-inside-work-tree &> /dev/null; then
-        echo "Not inside a git repository."
-        return 1
-    fi
-    readarray -t branches < <(git for-each-ref --format='%(color:reset)%(refname:short)' refs/heads/ | sort)
-    selected_branch=$(gum choose --no-strip-ansi "${branches[@]}")
-    if [ -n "$selected_branch" ]; then
-        git switch "$selected_branch"
-    else
-        echo "No branch selected."
-    fi
-}
