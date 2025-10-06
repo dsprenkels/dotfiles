@@ -40,7 +40,16 @@ function git-branchgc() {
         return 1
     fi
     readarray -t branches < <(git branch --format='%(refname:short)' | grep -v 'main\|master\|dev\|development\|staging\|production' | sort)
-    gum choose --no-limit --selected-prefix="✗ " "${branches[@]}"
+    readarray -t branches < <(printf '%s\n' "${branches[@]}" | gum filter --placeholder "Filter branches to delete" --height 10 --limit 20)
+	[ ${#branches[@]} -eq 0 ] && echo "No branches selected for deletion." && return 0
+	echo "The following branches will be deleted:"
+	printf '%s\n' "${branches[@]}"
+	if gum confirm "Are you sure you want to delete these branches?"; then
+		git branch -D "${branches[@]}"
+		echo "Deleted selected branches."
+	else
+		echo "Aborted. No branches were deleted."
+	fi
 }
 
 # interactive git switch branch
