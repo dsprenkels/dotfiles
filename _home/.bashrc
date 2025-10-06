@@ -30,6 +30,8 @@ function __as8_z_complete() {
 
 # interactively choose git branches to delete
 function git-branchgc() {
+	local branches
+
     if ! command -v gum &> /dev/null; then
         echo "gum could not be found, please install it first."
         return 1
@@ -54,7 +56,7 @@ function git-branchgc() {
 
 # interactive git switch branch
 function git-gsb() {
-    local selected_branch
+    local branches selected_branch detach_branches
 
     if ! command -v gum &> /dev/null; then
         echo "gum could not be found, please install it first."
@@ -66,8 +68,20 @@ function git-gsb() {
         return 1
     fi
     readarray -t branches < <(git for-each-ref --format='%(color:reset)%(refname:short)' refs/heads/ | sort)
+	detach_branches=()
+	for remote in $(git remote); do
+		main_branch=$(git remote show "$remote" | awk '/HEAD branch/ {print $NF}')
+		if [ -n "$main_branch" ]; then
+			branches=("$remote/$main_branch" "${branches[@]}")
+			detach_branches+=("$remote/$main_branch")
+		fi
+	done
     selected_branch=$(gum choose "${branches[@]}")
     if [ -n "$selected_branch" ]; then
+		if [[ " ${detach_branches[*]} " == *" $selected_branch "* ]]; then
+			git switch --detach "$selected_branch"
+			return $?
+		fi
         git switch "$selected_branch"
 		return $?
     else
