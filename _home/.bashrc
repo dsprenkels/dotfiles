@@ -140,3 +140,40 @@ fi
 if [[ $(which bin) ]]; then
 	export PATH="$HOME/.bin:$PATH"
 fi
+
+# interactively choose git branches to delete
+function git-branchgc() {
+    if ! command -v gum &> /dev/null; then
+        echo "gum could not be found, please install it first."
+        return 1
+    fi
+
+    if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+        echo "Not inside a git repository."
+        return 1
+    fi
+    readarray -t branches < <(git branch --format='%(refname:short)' | grep -v 'main\|master\|dev\|development\|staging\|production' | sort)
+    gum choose --no-limit --selected-prefix="✗ " "${branches[@]}"
+}
+
+# interactive git switch branch
+function git-gsb() {
+    local selected_branch
+
+    if ! command -v gum &> /dev/null; then
+        echo "gum could not be found, please install it first."
+        return 1
+    fi
+
+    if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+        echo "Not inside a git repository."
+        return 1
+    fi
+    readarray -t branches < <(git for-each-ref --format='%(color:reset)%(refname:short)' refs/heads/ | sort)
+    selected_branch=$(gum choose --no-strip-ansi "${branches[@]}")
+    if [ -n "$selected_branch" ]; then
+        git switch "$selected_branch"
+    else
+        echo "No branch selected."
+    fi
+}
