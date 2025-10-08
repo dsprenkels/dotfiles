@@ -6,7 +6,7 @@
 [alias]
         commitempty = commit --allow-empty-message --message=''
         lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-        gsb = !bash --login -c \"git-gsb\"
+        sb = !bash --login -c \"git-gsb\"
         branchgc = !bash --login -c \"git-branchgc\"
 [core]
         editor = vim
