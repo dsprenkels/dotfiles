@@ -55,7 +55,7 @@ function git-branchgc() {
 }
 
 # interactive git switch branch
-function git-gsb() {
+function git-sb() {
     local branches selected_branch detach_branches
 
     if ! command -v gum &> /dev/null; then
@@ -79,6 +79,7 @@ function git-gsb() {
     selected_branch=$(gum choose "${branches[@]}")
     if [ -n "$selected_branch" ]; then
 		if [[ " ${detach_branches[*]} " == *" $selected_branch "* ]]; then
+			git fetch "${selected_branch%%/*}" "${selected_branch##*/}"
 			git switch --detach "$selected_branch"
 			return $?
 		fi
