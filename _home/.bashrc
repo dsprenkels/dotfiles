@@ -124,18 +124,26 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
-# liquidprompt settings
-# shellcheck source=.liquidprompt
-# shellcheck disable=SC1091
-[[ $- = *i* ]] && source ~/.liquidprompt
+if which starship; then
+	eval "$(starship init bash)"
+elif [ -f ~/.liquidprompt ]; then
+	# liquidprompt settings
+	# shellcheck source=.liquidprompt
+	# shellcheck disable=SC1091
+	source ~/.liquidprompt
+fi
 
 # Explicitly enable bash completion
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
+	if [ -f /usr/share/bash-completion/bash_completion ]; then
+		# shellcheck source=/usr/share/bash-completion/bash_completion
+		# shellcheck disable=SC1091
+		source /usr/share/bash-completion/bash_completion
+	elif [ -f /etc/bash_completion ]; then
+		# shellcheck source=/etc/bash_completion
+		# shellcheck disable=SC1091
+		source /etc/bash_completion
+	fi
 fi
 
 # set gopath
