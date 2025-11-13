@@ -11,7 +11,7 @@ then
     exit 2
 fi
 
-if [ "${1+x}" != "--force" ] && [ "$(git status --porcelain=v1 2>/dev/null | grep -vc '_drafts/')" -ne 0 ]
+if [ "${1:-}" != "--force" ] && [ "$(git status --porcelain=v1 2>/dev/null)" -ne 0 ]
 then
     git status
     echo
