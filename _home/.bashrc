@@ -173,11 +173,6 @@ if [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
 	export PATH="$DPRINT_INSTALL/bin:$PATH"
 fi
 
-# if bin tool is installed, then use .bin as the directory to store bin binaries
-if [[ $(which bin) ]]; then
-	export PATH="$HOME/.bin:$PATH"
-fi
-
 # initialize z as zoxide (if present on this machine)
 if type zoxide >/dev/null 2>/dev/null; then
 	eval "$(zoxide init bash)"
