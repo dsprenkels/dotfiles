@@ -553,7 +553,7 @@ LP_LOAD_THRESHOLD=0.60
 # displayed.
 # Type: int
 # More information: https://liquidprompt.readthedocs.io/en/stable/config.html#LP_RUNTIME_THRESHOLD
-LP_RUNTIME_THRESHOLD=60
+LP_RUNTIME_THRESHOLD=2
 
 # Time in seconds that a command must run longer than for the terminal bell to
 # be rung.
