@@ -43,14 +43,18 @@ mbsync --all
 
 echo >&2 "Performing backups"
 if [[ "$hostname" == aang ]]; then
-	for dir in "Documents" ".config"; do
+	printf '%s\n' "Documents" ".config" | \
+	xargs -P 3 -I {} bash -c '
+		dir="{}"
 		echo >&2 "Backing up $dir to suki"
-		rsync --timeout="$timeout" -ravuzzh --delete "$(realpath "$HOME/${dir}")/" "$suki:/volume1/backup_replica/${hostname}/${dir}/"
-	done
+		rsync --timeout="'"$timeout"'" -ravuzzh --delete "$(realpath "$HOME/$dir")/" "'"$suki"':/volume1/backup_replica/'"${hostname}"'/$dir/"
+	'
 fi
-for dir in "Documents" "Pictures" "Videos" "Games" ".factorio" ".config"; do
-	echo >&2 "Backing up $dir to helikon"
-	rsync --timeout="$timeout" -ravuzh --rsync-path="/usr/bin/rsync" --port="$helikon_port" --delete "$(realpath "$HOME/${dir}")/" "$helikon:/volume1/homes/amber/katarastorage/private/backup/${hostname}_backup/${dir}/"
-done
+printf '%s\n' "Documents" "Pictures" "Videos" "Games" ".factorio" ".config" | \
+xargs -P 3 -I {} bash -c '
+    dir="{}"
+    echo >&2 "Backing up $dir to helikon"
+    rsync --timeout="'"$timeout"'" -ravuzh --rsync-path="/usr/bin/rsync" --port="'"$helikon_port"'" --delete "$(realpath "$HOME/$dir")/" "'"$helikon"':/volume1/homes/amber/katarastorage/private/backup/'"${hostname}"'_backup/$dir/"
+'
 
 exit 0
