@@ -210,7 +210,51 @@ if [[ $- = *i* ]] && type zoxide >/dev/null 2>/dev/null; then
 fi
 
 if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
-    function test.py() {
-        python3 ~/git/scratch/test.py "$@"
+    function polars-test() {
+        local script_name="$HOME/git/scratch/test.py"
+        local args=()
+        local found_separator=false
+
+        if [ $# -eq 0 ]; then
+            echo >&2 -e "\e[1;34mrunning script: python3 \"$script_name\" ${args[*]}\e[0m"
+            python3 "$script_name"
+            return $?
+        fi
+
+        # Parse arguments to find separator
+        for arg in "$@"; do
+            if [ "$arg" = "--" ]; then
+                found_separator=true
+                continue
+            fi
+            if [ "$found_separator" = true ]; then
+                args+=("$arg")
+            else
+                script_name="$HOME/git/scratch/test-$arg.py"
+            fi
+        done
+
+        if [ ! -f "$script_name" ]; then
+            echo >&2 -e "\e[1;31merror: script $script_name not found\e[0m"
+            return 1
+        fi
+
+        echo >&2 -e "\e[1;34mrunning script: python3 \"$script_name\" ${args[*]}\e[0m"
+        python3 "$script_name" "${args[@]}"
     }
+
+    alias pt='polars-test'
+
+    function _polars_test_complete() {
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        local prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+        if [ "$prev" = "polars-test" ] || [ "$prev" = "pt" ]; then
+            local scripts
+            mapfile -t scripts < <(find "$HOME/git/scratch" -name 'test-*.py' -printf '%f\n' 2>/dev/null | sed 's/^test-//; s/\.py$//')
+            mapfile -t COMPREPLY < <(compgen -W "${scripts[*]}" -- "$cur")
+        fi
+    }
+
+    complete -F _polars_test_complete polars-test pt
 fi
