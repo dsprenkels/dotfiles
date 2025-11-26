@@ -208,3 +208,9 @@ if [[ $- = *i* ]] && type zoxide >/dev/null 2>/dev/null; then
     }
     \builtin complete -F __as8_z_complete -o filenames -- z
 fi
+
+if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
+    function test.py() {
+        python3 ~/git/scratch/test.py "$@"
+    }
+fi
