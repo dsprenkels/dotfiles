@@ -42,16 +42,14 @@ function git-sb() {
     readarray -t branches < <(git for-each-ref --format='%(color:reset)%(refname:short)' refs/heads/ | sort)
     detach_branches=()
     for remote in $(git remote); do
-        main_branch=$(git remote show "$remote" | awk '/HEAD branch/ {print $NF}')
-        if [ -n "$main_branch" ]; then
-            branches=("$remote/$main_branch" "${branches[@]}")
-            detach_branches+=("$remote/$main_branch")
-        fi
+        branches=("$remote/HEAD" "${branches[@]}")
+        detach_branches+=("$remote/HEAD")
     done
     selected_branch=$(gum choose "${branches[@]}")
     if [ -n "$selected_branch" ]; then
         if [[ " ${detach_branches[*]} " == *" $selected_branch "* ]]; then
-            git fetch "${selected_branch%%/*}" "${selected_branch##*/}"
+            git fetch "${selected_branch%%/*}" "${selected_branch##*/}" ||
+                echo -e "\e[1;33mwarning: failed to fetch from remote ${selected_branch%%/*}\e[0m"
             git switch --detach "$selected_branch"
             return $?
         fi
