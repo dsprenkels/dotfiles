@@ -38,7 +38,7 @@
 <Multi_key> <c> <o> <l> : ":"
 <Multi_key> <c> <o> <n> : "≡"
 <Multi_key> <d> <i> <v> : "÷"
-<Multi_key> <i> <n> : "∈"
+<Multi_key> <i> <n> <n> : "∈"
 <Multi_key> <e> <l> <l> : "ℓ"
 <Multi_key> <e> <x> <i> <s> <t> <s> : "∃"
 <Multi_key> <exclam> <i> <n> : "∉"
