@@ -76,13 +76,13 @@ fi
 
 # END OF NON-INTERACTIVE SECTION, START OF INTERACTIVE SECTION
 
-if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]] && [[ $(pwd) =~ ^/home/amber/git ]] && [ -f "$HOME/git/scratch/test.py" ]; then
-    # If the destination file does not exist yet, make a daily backup of the test.py file
+if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]] && [[ $(pwd) =~ ^/home/amber/git ]] && [ -d "$HOME/git/scratch" ]; then
+    # Make a daily backup of all files up to 4M
     (
-        mkdir -p "$HOME/git/backup"
-        dest_filename="test-$(date +"%Y-%m-%d").py"
-        if [ ! -f "$HOME/git/backup/$dest_filename" ]; then
-            cp --reflink=auto --archive "$HOME/git/scratch/test.py" "$HOME/git/backup/$dest_filename"
+        backup_dir="$HOME/git/backup/$(date +"%Y-%m-%d")"
+        if [ ! -d "$backup_dir" ]; then
+            mkdir -p "$backup_dir"
+            find "$HOME/git/scratch" -maxdepth 1 -type f -size -4M -exec cp --reflink=auto --archive {} "$backup_dir/" \;
         fi
     )
 fi
