@@ -208,10 +208,37 @@ if [[ $- = *i* ]] && type zoxide >/dev/null 2>/dev/null; then
 fi
 
 if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
+    function polars-test-new() {
+        local template="$HOME/git/scratch/test-template.py"
+        local test_name
+
+        test_name="$(gum input --prompt="Test name: " --placeholder="test-example.py" --value="test-")"
+
+        if [[ ! $test_name =~ ^test-.*\.py$ ]]; then
+            echo >&2 -e "\e[1;31merror: test name must match pattern test-*.py\e[0m"
+            return 1
+        fi
+        local script_name="$HOME/git/scratch/$test_name"
+        if [ -f "$script_name" ]; then
+            echo >&2 -e "\e[1;31merror: file $script_name already exists\e[0m"
+            return 1
+        fi
+
+        cp --reflink=auto "$template" "$HOME/git/scratch/$test_name" && \
+        echo >&2 -e "\e[1;32mcreated new test file at $script_name\e[0m"
+    }
+
     function polars-test() {
         local script_name="$HOME/git/scratch/test.py"
         local args=()
         local found_separator=false
+
+        for arg in "$@"; do
+            if [ "$arg" = "--new" ]; then
+                polars-test-new
+                return $?
+            fi
+        done
 
         if [ $# -eq 0 ]; then
             echo >&2 -e "\e[1;34mrunning script: python3 \"$script_name\" ${args[*]}\e[0m"
@@ -250,7 +277,7 @@ if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD
         if [ "$prev" = "polars-test" ] || [ "$prev" = "pt" ]; then
             local scripts
             mapfile -t scripts < <(find "$HOME/git/scratch" -name 'test-*.py' -printf '%f\n' 2>/dev/null | sed 's/^test-//; s/\.py$//')
-            mapfile -t COMPREPLY < <(compgen -W "${scripts[*]}" -- "$cur")
+            mapfile -t COMPREPLY < <(compgen -W "--new ${scripts[*]}" -- "$cur")
         fi
     }
 
