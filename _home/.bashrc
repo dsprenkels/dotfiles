@@ -83,6 +83,8 @@ if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD
         if [ ! -d "$backup_dir" ]; then
             mkdir -p "$backup_dir"
             find "$HOME/git/scratch" -maxdepth 1 -type f -size -4M -exec cp --reflink=auto --archive {} "$backup_dir/" \;
+            backup_size=$(du -sh "$backup_dir" | cut -f1)
+            echo >&2 -e "\e[0;34mcreated backup of scratch files at $backup_dir ($backup_size)\e[0m"
         fi
     )
 fi
