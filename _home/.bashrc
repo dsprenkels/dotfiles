@@ -155,12 +155,12 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 # set password store directory
-if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostnamectl hostname) = aang ]]; then
     export PASSWORD_STORE_DIR=~/Documents/Vault/password-store
 fi
 
 # use keychain if we're on aang/suyin-arch and we are logged in via SSH
-if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostnamectl hostname) =~ ^(aang|S)$ ]]; then
     if [ -n "$SSH_CONNECTION" ]; then
         eval "$(keychain --eval --quiet)"
     fi
