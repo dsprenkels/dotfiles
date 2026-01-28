@@ -28,7 +28,8 @@ function git-branchgc() {
 
 # interactive git switch branch
 function git-sb() {
-    local branches selected_branch detach_branches
+    local branches selected_branch detach_branches create_new_branch
+    create_new_branch="[create branch] ✨"
 
     if ! command -v gum &> /dev/null; then
         echo "gum could not be found, please install it first."
@@ -45,8 +46,21 @@ function git-sb() {
         branches=("$remote/HEAD" "${branches[@]}")
         detach_branches+=("$remote/HEAD")
     done
+    branches+=("$create_new_branch")
     selected_branch=$(gum choose "${branches[@]}")
     if [ -n "$selected_branch" ]; then
+        if [ "$selected_branch" = "$create_new_branch" ]; then
+            local new_branch_name
+            new_branch_name=$(gum input --prompt="new branch name: " --placeholder="branch-name")
+            if [ -z "$new_branch_name" ]; then
+                echo -e "\e[1;31merror: branch name empty\e[0m"
+                return 1
+            fi
+            git fetch upstream main ||
+                echo -e "\e[1;33mwarning: failed to fetch from upstream\e[0m"
+            git switch -c "$new_branch_name" upstream/main
+            return $?
+        fi
         if [[ " ${detach_branches[*]} " == *" $selected_branch "* ]]; then
             git fetch "${selected_branch%%/*}" "${selected_branch##*/}" ||
                 echo -e "\e[1;33mwarning: failed to fetch from remote ${selected_branch%%/*}\e[0m"
