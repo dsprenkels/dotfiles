@@ -8,6 +8,8 @@
         lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
         sb = !bash --login -c \"git-sb\"
         branchgc = !bash --login -c \"git-branchgc\"
+        sns = show --name-status
+        sno = show --name-only
 [core]
         editor = vim
         pager = bat --plain
