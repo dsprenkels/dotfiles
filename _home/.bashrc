@@ -118,7 +118,14 @@ if [[ $- = *i* ]]; then
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
-    alias va='source .venv/bin/activate'
+fi
+
+if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
+    function va() {
+        local dir="${1:-.}"
+        # shellcheck disable=SC1091
+        source "$dir/.venv/bin/activate"
+    }
 fi
 
 # liquidprompt settings
@@ -129,8 +136,10 @@ fi
 # Explicitly enable bash completion
 if ! shopt -oq posix; then
     if [ -f /usr/share/bash-completion/bash_completion ]; then
+        # shellcheck disable=SC1091
         source /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
+    elif [ -f /etc/bash_completion ]; then
+        # shellcheck disable=SC1091
         source /etc/bash_completion
     fi
 fi
