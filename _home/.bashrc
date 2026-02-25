@@ -205,34 +205,6 @@ if [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
     export PATH="$DPRINT_INSTALL/bin:$PATH"
 fi
 
-# initialize z as zoxide (if present on this machine)
-if [[ $- = *i* ]] && type zoxide >/dev/null 2>/dev/null; then
-    eval "$(zoxide init bash)"
-
-    # add z as zoxide or cd
-    \builtin unalias z &>/dev/null || \builtin true
-    function z() {
-        if type __zoxide_z >/dev/null 2>/dev/null; then
-            __zoxide_z "$@"
-        else
-            # shellcheck disable=2164
-            cd "$@"
-        fi
-    }
-    function __as8_z_complete() {
-        if type __zoxide_z >/dev/null 2>/dev/null; then
-            # use `zoxide` completions
-            __zoxide_z_complete "$@"
-        else
-            # use `cd` completions
-            \builtin mapfile -t COMPREPLY < <(
-                \builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
-            )
-        fi
-    }
-    \builtin complete -F __as8_z_complete -o filenames -- z
-fi
-
 if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
     function polars-test-new() {
         local template="$HOME/git/scratch/test-template.py"
@@ -308,4 +280,33 @@ if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD
     }
 
     complete -F _polars_test_complete polars-test pt
+fi
+
+
+# initialize z as zoxide (if present on this machine)
+if [[ $- = *i* ]] && type zoxide >/dev/null 2>/dev/null; then
+    eval "$(zoxide init bash)"
+
+    # add z as zoxide or cd
+    \builtin unalias z &>/dev/null || \builtin true
+    function z() {
+        if type __zoxide_z >/dev/null 2>/dev/null; then
+            __zoxide_z "$@"
+        else
+            # shellcheck disable=2164
+            cd "$@"
+        fi
+    }
+    function __as8_z_complete() {
+        if type __zoxide_z >/dev/null 2>/dev/null; then
+            # use `zoxide` completions
+            __zoxide_z_complete "$@"
+        else
+            # use `cd` completions
+            \builtin mapfile -t COMPREPLY < <(
+                \builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
+            )
+        fi
+    }
+    \builtin complete -F __as8_z_complete -o filenames -- z
 fi
