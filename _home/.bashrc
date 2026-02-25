@@ -310,3 +310,9 @@ if [[ $- = *i* ]] && type zoxide >/dev/null 2>/dev/null; then
     }
     \builtin complete -F __as8_z_complete -o filenames -- z
 fi
+
+if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]] && [[ $(pwd) =~ ^$HOME/git/polars ]]; then
+    echo >&2 -e "\e[1;34msource '$HOME/git/polars/.venv/bin/activate'\e[0m"
+    # shellcheck disable=SC1091
+    source "$HOME/git/polars/.venv/bin/activate"
+fi
