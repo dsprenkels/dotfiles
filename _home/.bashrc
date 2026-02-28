@@ -76,7 +76,7 @@ function git-sb() {
 }
 
 # preferred editor is vim, and preferred pager is less
-if [[ $- = *i* && $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $- = *i* && $(hostnamectl hostname) == aang ]]; then
     export EDITOR="vim"
     export PAGER="less"
 fi
@@ -145,13 +145,13 @@ if ! shopt -oq posix; then
 fi
 
 # set gopath
-if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostnamectl hostname) == aang ]]; then
     export GOPATH="$HOME/.cache/go"
     export PATH="$PATH:/usr/lib/go-1.6/bin:$GOPATH/bin"
 fi
 
 # set ruby path
-if [[ $(hostnamectl hostname) =~ ^(aang|suyin-arch)$ ]]; then
+if [[ $(hostnamectl hostname) == aang ]]; then
     export PATH="$PATH:$HOME/.gem/ruby/3.0.0/bin"
 fi
 
@@ -169,10 +169,8 @@ if [[ $(hostnamectl hostname) = aang ]]; then
 fi
 
 # use keychain if we're on aang/suyin-arch and we are logged in via SSH
-if [[ $(hostnamectl hostname) =~ ^(aang|S)$ ]]; then
-    if [ -n "$SSH_CONNECTION" ]; then
-        eval "$(keychain --eval --quiet)"
-    fi
+if ([[ $(hostnamectl hostname) == aang ]] && [ -n "$SSH_CONNECTION" ]) || ([[ $(hostnamectl hostname) == Suyin ]] && grep -qi microsoft /proc/version); then
+    eval "$(keychain --eval --quiet)"
 fi
 
 # override ripgrep with settings that fit interactive use
