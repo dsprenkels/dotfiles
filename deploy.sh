@@ -7,8 +7,7 @@ AUTORCDIR="$(realpath "$(dirname "$0")/_home")"
 
 if [ -z "${HOST+x}" ]
 then
-    echo >&2 "\$HOST variable is not set"
-    exit 2
+    HOST="local"
 fi
 
 if [ "${1:-}" != "--force" ] && [ "$(git status --porcelain=v1 2>/dev/null)" -ne 0 ]
