@@ -68,6 +68,11 @@
 <Multi_key> <v> <a> <r> <p> <h> <i> : "φ"
 <Multi_key> <x> <o> <r> : "⊻"
 
+<Multi_key <.> <.> <.> : "…"
+<Multi_key <l> <d> <o> <t> <s> : "…"
+<Multi_key <m> <d> <o> <t> <s> : "⋯"
+<Multi_key <v> <d> <o> <t> <s> : "⋮"
+
 # Greek symbols
 <Multi_key> <g> <A> : "Α"
 <Multi_key> <g> <a> : "α"
