@@ -314,3 +314,8 @@ if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD
     # shellcheck disable=SC1091
     source "$HOME/git/polars/.venv/bin/activate"
 fi
+if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]] && [[ "$(pwd)" == "$HOME/git/polars-cloud" ]]; then
+    echo >&2 -e "\e[1;34msource '$HOME/git/polars-cloud/.venv/bin/activate'\e[0m"
+    # shellcheck disable=SC1091
+    source "$HOME/git/polars-cloud/.venv/bin/activate"
+fi
