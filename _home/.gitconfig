@@ -10,6 +10,7 @@
         branchgc = !bash --login -c \"git-branchgc\"
         sns = show --name-status
         sno = show --name-only
+        snap = commit --allow-empty-message ''
 [core]
         editor = vim
         pager = bat --plain
