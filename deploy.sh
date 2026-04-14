@@ -10,7 +10,7 @@ then
     HOST="local"
 fi
 
-if [ "${1:-}" != "--force" ] && [ "$(git status --porcelain=v1 2>/dev/null)" -ne 0 ]
+if [ $# -gt 1 ] && [ "${1:-}" != "--force" ] && [ "$(git status --porcelain=v1 2>/dev/null)" -ne 0 ]
 then
     git status
     echo
