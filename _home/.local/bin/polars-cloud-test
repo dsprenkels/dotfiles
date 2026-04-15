@@ -1,0 +1,221 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# pct — polars-cloud-test
+#
+# Builds the compute plane, starts the server, runs a test script, and
+# collects all output.  Replaces the manual two-terminal workflow.
+
+SCRIPT_DIR="$HOME/git/polars-cloud/compute-plane"
+SCRATCH_DIR="$HOME/git/scratch"
+
+# ── usage ────────────────────────────────────────────────────────────
+
+usage() {
+    cat <<'EOF'
+pct — polars-cloud-test
+
+Usage: pct [OPTIONS] <testname> [-- <extra-args>...]
+
+Builds the compute plane (via ./up.sh), waits for the server to become
+ready, runs ~/git/scratch/test-<testname>.py, then shuts down the server.
+
+Options:
+  --keep-running       Don't kill the server after the test finishes
+  --embed-frontend     Set EMBED_FRONTEND=1 (adds embed-frontend cargo feature)
+  -h, --help           Show this help message
+
+Environment:
+  RUST_LOG             Log level for the server (default: error)
+
+Examples:
+  pct cloud
+  pct range-join
+  pct cloud -- --verbose
+  pct --keep-running cloud
+EOF
+}
+
+# ── parse arguments ──────────────────────────────────────────────────
+
+KEEP_RUNNING=false
+DO_EMBED_FRONTEND=false
+TEST_NAME=""
+TEST_ARGS=()
+PARSING_TEST_ARGS=false
+
+for arg in "$@"; do
+    if [[ "$PARSING_TEST_ARGS" == true ]]; then
+        TEST_ARGS+=("$arg")
+        continue
+    fi
+    case "$arg" in
+        -h|--help)         usage; exit 0 ;;
+        --keep-running)    KEEP_RUNNING=true ;;
+        --embed-frontend)  DO_EMBED_FRONTEND=true ;;
+        --)                PARSING_TEST_ARGS=true ;;
+        -*)                echo "error: unknown option: $arg" >&2; usage >&2; exit 1 ;;
+        *)
+            if [[ -z "$TEST_NAME" ]]; then
+                TEST_NAME="$arg"
+            else
+                echo "error: unexpected argument: $arg" >&2; usage >&2; exit 1
+            fi
+            ;;
+    esac
+done
+
+if [[ -z "$TEST_NAME" ]]; then
+    echo "error: no test name provided" >&2
+    usage >&2
+    exit 1
+fi
+
+TEST_SCRIPT="$SCRATCH_DIR/test-${TEST_NAME}.py"
+if [[ ! -f "$TEST_SCRIPT" ]]; then
+    echo -e "\e[1;31merror: script $TEST_SCRIPT not found\e[0m" >&2
+    exit 1
+fi
+
+# ── setup ────────────────────────────────────────────────────────────
+
+cd "$SCRIPT_DIR"
+
+WORK_DIR=$(mktemp -d "/tmp/pct.XXXXXX")
+SERVER_STDERR="$WORK_DIR/server_stderr"
+TEST_STDOUT="$WORK_DIR/test_stdout"
+TEST_STDERR="$WORK_DIR/test_stderr"
+SERVER_READY_FIFO="$WORK_DIR/ready_fifo"
+touch "$SERVER_STDERR" "$TEST_STDOUT" "$TEST_STDERR"
+mkfifo "$SERVER_READY_FIFO"
+
+# shellcheck disable=SC2329
+cleanup_work_dir() { rm -rf "$WORK_DIR"; }
+trap cleanup_work_dir EXIT
+
+START_TS=$(date +%s)
+
+# Remove old .dot files
+rm -f ./*.dot
+
+# Force colors in non-TTY contexts
+export CARGO_TERM_COLOR=always
+export CLICOLOR_FORCE=1
+export FORCE_COLOR=1
+export PC_PLANNER_DEBUG_GRAPHS=1
+export RUST_LOG="${RUST_LOG:-error}"
+[[ "$DO_EMBED_FRONTEND" == true ]] && export EMBED_FRONTEND=1
+
+# ── start up.sh ──────────────────────────────────────────────────────
+
+# Wrap up.sh in a subshell that signals readiness via the FIFO.
+# During the build phase (before "Running scheduler"), output is shown
+# live so the user can follow cargo compilation progress.  After that,
+# server runtime output (dbg!(), logs) is buffered for pagination.
+(
+    # Use `script` to give up.sh a PTY so that all programs inside see a
+    # terminal and produce colored output.  `script -qefc` merges
+    # stdout+stderr into one stream (inherent PTY limitation), so we
+    # cannot separate them at the up.sh level.  Instead we capture the
+    # combined stream and treat it all as "server log" for pagination.
+    script -qefc "./up.sh" /dev/null < /dev/null 2>&1 |
+    {
+        READY=false
+        while IFS= read -r line; do
+            if [[ "$READY" == false ]]; then
+                # Build phase: show cargo output live so the user can
+                # follow compilation progress.
+                echo "$line" >&2
+                if [[ "$line" == *"Running scheduler"* ]]; then
+                    READY=true
+                    echo ready > "$SERVER_READY_FIFO"
+                fi
+            else
+                # Server phase: buffer for later pagination.
+                echo "$line" >> "$SERVER_STDERR"
+            fi
+        done
+        # If the server exited before becoming ready, unblock the FIFO.
+        if [[ "$READY" == false ]]; then
+            echo failed > "$SERVER_READY_FIFO"
+        fi
+    }
+) &
+SERVER_PID=$!
+
+echo -e >&2 "\e[1;34mpct: building & starting server...\e[0m"
+
+# Block until the server is ready (or dead).
+READY_STATUS=$(cat "$SERVER_READY_FIFO")
+if [[ "$READY_STATUS" != "ready" ]]; then
+    echo -e >&2 "\e[1;31mpct: server died before becoming ready\e[0m"
+    wait "$SERVER_PID" 2>/dev/null || true
+    # Build output was already shown live, nothing more to display.
+    exit 1
+fi
+
+# Give workers a moment to fully bind their ports.
+sleep 2
+
+echo -e >&2 "\e[1;34mpct: server ready — running test-${TEST_NAME}.py\e[0m"
+
+# ── run test ─────────────────────────────────────────────────────────
+
+TEST_EXIT=0
+python3 "$TEST_SCRIPT" "${TEST_ARGS[@]}" \
+    > "$TEST_STDOUT" 2> "$TEST_STDERR" \
+    || TEST_EXIT=$?
+
+# ── stop server ──────────────────────────────────────────────────────
+
+if [[ "$KEEP_RUNNING" == true ]]; then
+    echo -e >&2 "\e[1;33mpct: server left running (PID $SERVER_PID)\e[0m"
+    echo -e >&2 "\e[1;33mpct: stop with:  kill $SERVER_PID\e[0m"
+else
+    kill "$SERVER_PID" 2>/dev/null || true
+    wait "$SERVER_PID" 2>/dev/null || true
+fi
+
+# ── convert .dot → .svg ─────────────────────────────────────────────
+
+GENERATED_IMAGES=()
+for dotfile in ./*.dot; do
+    [[ -f "$dotfile" ]] || continue
+    FILE_TS=$(stat -c %Y "$dotfile")
+    if [[ "$FILE_TS" -ge "$START_TS" ]]; then
+        imgfile="${dotfile%.dot}.svg"
+        if dot -Tsvg "$dotfile" -o "$imgfile" 2>/dev/null; then
+            GENERATED_IMAGES+=("$(realpath "$imgfile")")
+        fi
+    fi
+done
+
+# ── present output ───────────────────────────────────────────────────
+
+# stdout → stdout
+cat "$TEST_STDOUT"
+
+# List generated debug graphs
+if [[ ${#GENERATED_IMAGES[@]} -gt 0 ]]; then
+    echo ""
+    echo -e "\e[1;34mGenerated debug graphs:\e[0m"
+    for img in "${GENERATED_IMAGES[@]}"; do
+        echo "  $img"
+    done
+fi
+
+# stderr → paginator
+COMBINED_STDERR="$WORK_DIR/combined_stderr"
+{
+    [[ -s "$SERVER_STDERR" ]] && cat "$SERVER_STDERR"
+    [[ -s "$TEST_STDERR" ]]  && cat "$TEST_STDERR"
+} > "$COMBINED_STDERR" || true
+
+if [[ -s "$COMBINED_STDERR" ]]; then
+    echo "" >&2
+    echo -e >&2 "\e[1;34mpct: stderr output (paginated) ───────────────────────\e[0m"
+    bat --plain --paging=always < "$COMBINED_STDERR" >&2
+fi
+
+exit "$TEST_EXIT"

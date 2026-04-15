@@ -278,6 +278,36 @@ if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD
     }
 
     complete -F _polars_test_complete polars-test pt
+
+    alias pct="polars-cloud-test"
+
+    function _polars_cloud_test_complete() {
+        local cur="${COMP_WORDS[COMP_CWORD]}"
+        local prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+        # Complete options
+        if [[ "$cur" == -* ]]; then
+            mapfile -t COMPREPLY < <(compgen -W "--keep-running --embed-frontend --help" -- "$cur")
+            return
+        fi
+
+        # Complete test names (skip if we already have a positional arg)
+        local has_test=false
+        for ((i=1; i<COMP_CWORD; i++)); do
+            case "${COMP_WORDS[i]}" in
+                -*|--) ;;
+                *) has_test=true; break ;;
+            esac
+        done
+
+        if [[ "$has_test" == false ]]; then
+            local scripts
+            mapfile -t scripts < <(find "$HOME/git/scratch" -name 'test-*.py' -printf '%f\n' 2>/dev/null | sed 's/^test-//; s/\.py$//')
+            mapfile -t COMPREPLY < <(compgen -W "${scripts[*]}" -- "$cur")
+        fi
+    }
+
+    complete -F _polars_cloud_test_complete pct
 fi
 
 
