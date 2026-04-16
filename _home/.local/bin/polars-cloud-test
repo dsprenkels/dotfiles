@@ -90,8 +90,19 @@ SERVER_READY_FIFO="$WORK_DIR/ready_fifo"
 touch "$SERVER_STDERR" "$TEST_STDOUT" "$TEST_STDERR"
 mkfifo "$SERVER_READY_FIFO"
 
+SERVER_PID=""
+
 # shellcheck disable=SC2329
-cleanup_work_dir() { rm -rf "$WORK_DIR"; }
+cleanup_work_dir() {
+    # Kill the entire server process group (subshell + script child +
+    # pipeline reader) before removing WORK_DIR, so no orphaned process
+    # is still writing to files there when we delete the directory.
+    if [[ -n "$SERVER_PID" ]]; then
+        kill -- "-$SERVER_PID" 2>/dev/null || true
+        wait "$SERVER_PID" 2>/dev/null || true
+    fi
+    rm -rf "$WORK_DIR"
+}
 trap cleanup_work_dir EXIT
 
 START_TS=$(date +%s)
@@ -113,6 +124,10 @@ export RUST_LOG="${RUST_LOG:-error}"
 # During the build phase (before "Running scheduler"), output is shown
 # live so the user can follow cargo compilation progress.  After that,
 # server runtime output (dbg!(), logs) is buffered for pagination.
+# Enable monitor mode so the subshell starts in its own process group
+# (PGID = PID of the subshell).  This lets us kill the whole group with
+# kill -- -$SERVER_PID, including the `script` child and pipeline reader.
+set -m
 (
     # Use `script` to give up.sh a PTY so that all programs inside see a
     # terminal and produce colored output.  `script -qefc` merges
@@ -143,6 +158,7 @@ export RUST_LOG="${RUST_LOG:-error}"
     }
 ) &
 SERVER_PID=$!
+set +m  # restore non-interactive mode
 
 echo -e >&2 "\e[1;34mpct: building & starting server...\e[0m"
 
@@ -170,11 +186,13 @@ python3 "$TEST_SCRIPT" "${TEST_ARGS[@]}" \
 # ── stop server ──────────────────────────────────────────────────────
 
 if [[ "$KEEP_RUNNING" == true ]]; then
-    echo -e >&2 "\e[1;33mpct: server left running (PID $SERVER_PID)\e[0m"
-    echo -e >&2 "\e[1;33mpct: stop with:  kill $SERVER_PID\e[0m"
+    echo -e >&2 "\e[1;33mpct: server left running (PGID $SERVER_PID)\e[0m"
+    echo -e >&2 "\e[1;33mpct: stop with:  kill -- -$SERVER_PID\e[0m"
+    SERVER_PID=""  # prevent cleanup_work_dir from killing it
 else
-    kill "$SERVER_PID" 2>/dev/null || true
+    kill -- "-$SERVER_PID" 2>/dev/null || true
     wait "$SERVER_PID" 2>/dev/null || true
+    SERVER_PID=""  # already stopped; cleanup_work_dir need not repeat this
 fi
 
 # ── convert .dot → .svg ─────────────────────────────────────────────
