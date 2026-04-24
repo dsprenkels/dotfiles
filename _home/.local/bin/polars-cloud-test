@@ -233,7 +233,7 @@ COMBINED_STDERR="$WORK_DIR/combined_stderr"
 if [[ -s "$COMBINED_STDERR" ]]; then
     echo "" >&2
     echo -e >&2 "\e[1;34mpct: stderr output (paginated) ───────────────────────\e[0m"
-    bat --plain --paging=always < "$COMBINED_STDERR" >&2
+    bat --plain --paging=auto < "$COMBINED_STDERR" >&2
 fi
 
 exit "$TEST_EXIT"
