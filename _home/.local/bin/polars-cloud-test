@@ -17,11 +17,14 @@ usage() {
 pct — polars-cloud-test
 
 Usage: pct [OPTIONS] <testname> [-- <extra-args>...]
+       pct [OPTIONS] -c <command>
 
 Builds the compute plane (via ./up.sh), waits for the server to become
-ready, runs ~/git/scratch/test-<testname>.py, then shuts down the server.
+ready, runs ~/git/scratch/test-<testname>.py (or a shell command with -c),
+then shuts down the server.
 
 Options:
+  -c, --command <cmd>  Execute <cmd> as a shell command instead of a script file
   --keep-running       Don't kill the server after the test finishes
   --embed-frontend     Set EMBED_FRONTEND=1 (adds embed-frontend cargo feature)
   -h, --help           Show this help message
@@ -34,6 +37,7 @@ Examples:
   pct range-join
   pct cloud -- --verbose
   pct --keep-running cloud
+  pct -c 'python3 ~/git/scratch/test-cloud.py --verbose'
 EOF
 }
 
@@ -44,8 +48,15 @@ DO_EMBED_FRONTEND=false
 TEST_NAME=""
 TEST_ARGS=()
 PARSING_TEST_ARGS=false
+COMMAND=""
+NEXT_IS_COMMAND=false
 
 for arg in "$@"; do
+    if [[ "$NEXT_IS_COMMAND" == true ]]; then
+        COMMAND="$arg"
+        NEXT_IS_COMMAND=false
+        continue
+    fi
     if [[ "$PARSING_TEST_ARGS" == true ]]; then
         TEST_ARGS+=("$arg")
         continue
@@ -54,6 +65,7 @@ for arg in "$@"; do
         -h|--help)         usage; exit 0 ;;
         --keep-running)    KEEP_RUNNING=true ;;
         --embed-frontend)  DO_EMBED_FRONTEND=true ;;
+        -c|--command)      NEXT_IS_COMMAND=true ;;
         --)                PARSING_TEST_ARGS=true ;;
         -*)                echo "error: unknown option: $arg" >&2; usage >&2; exit 1 ;;
         *)
@@ -66,16 +78,26 @@ for arg in "$@"; do
     esac
 done
 
-if [[ -z "$TEST_NAME" ]]; then
-    echo "error: no test name provided" >&2
+if [[ "$NEXT_IS_COMMAND" == true ]]; then
+    echo "error: -c|--command requires an argument" >&2; usage >&2; exit 1
+fi
+
+if [[ -n "$COMMAND" && -n "$TEST_NAME" ]]; then
+    echo "error: -c|--command and <testname> are mutually exclusive" >&2; usage >&2; exit 1
+fi
+
+if [[ -z "$COMMAND" && -z "$TEST_NAME" ]]; then
+    echo "error: no test name or command provided" >&2
     usage >&2
     exit 1
 fi
 
-TEST_SCRIPT="$SCRATCH_DIR/test-${TEST_NAME}.py"
-if [[ ! -f "$TEST_SCRIPT" ]]; then
-    echo -e "\e[1;31merror: script $TEST_SCRIPT not found\e[0m" >&2
-    exit 1
+if [[ -z "$COMMAND" ]]; then
+    TEST_SCRIPT="$SCRATCH_DIR/test-${TEST_NAME}.py"
+    if [[ ! -f "$TEST_SCRIPT" ]]; then
+        echo -e "\e[1;31merror: script $TEST_SCRIPT not found\e[0m" >&2
+        exit 1
+    fi
 fi
 
 # ── setup ────────────────────────────────────────────────────────────
@@ -174,14 +196,24 @@ fi
 # Give workers a moment to fully bind their ports.
 sleep 2
 
-echo -e >&2 "\e[1;34mpct: server ready — running test-${TEST_NAME}.py\e[0m"
+if [[ -n "$COMMAND" ]]; then
+    echo -e >&2 "\e[1;34mpct: server ready — running command: $COMMAND\e[0m"
+else
+    echo -e >&2 "\e[1;34mpct: server ready — running test-${TEST_NAME}.py\e[0m"
+fi
 
 # ── run test ─────────────────────────────────────────────────────────
 
 TEST_EXIT=0
-python3 "$TEST_SCRIPT" "${TEST_ARGS[@]}" \
-    > "$TEST_STDOUT" 2> "$TEST_STDERR" \
-    || TEST_EXIT=$?
+if [[ -n "$COMMAND" ]]; then
+    bash -c "$COMMAND" \
+        > "$TEST_STDOUT" 2> "$TEST_STDERR" \
+        || TEST_EXIT=$?
+else
+    python3 "$TEST_SCRIPT" "${TEST_ARGS[@]}" \
+        > "$TEST_STDOUT" 2> "$TEST_STDERR" \
+        || TEST_EXIT=$?
+fi
 
 # ── stop server ──────────────────────────────────────────────────────
 
@@ -221,6 +253,9 @@ if [[ ${#GENERATED_IMAGES[@]} -gt 0 ]]; then
     for img in "${GENERATED_IMAGES[@]}"; do
         echo "  $img"
     done
+else
+    echo ""
+    echo -e "\e[1;33mNo new debug graphs appeared.\e[0m"
 fi
 
 # stderr → paginator
