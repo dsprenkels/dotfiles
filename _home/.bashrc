@@ -287,7 +287,7 @@ if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD
 
         # Complete options
         if [[ "$cur" == -* ]]; then
-            mapfile -t COMPREPLY < <(compgen -W "--keep-running --embed-frontend --help" -- "$cur")
+            mapfile -t COMPREPLY < <(compgen -W "--command --keep-running --embed-frontend --help" -- "$cur")
             return
         fi
 
