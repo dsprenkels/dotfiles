@@ -1,1 +1,2 @@
 keybind = f11=toggle_fullscreen
+shell-integration-features = sudo
