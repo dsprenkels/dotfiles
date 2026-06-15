@@ -310,6 +310,33 @@ if [[ $- = *i* ]] && [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD
     complete -F _polars_cloud_test_complete pct
 fi
 
+if [[ $(hostnamectl hostname) == amber-ThinkPad-P14s-Gen-6-AMD ]]; then
+    function gh-diff-pr() {
+        # Based on https://daisy.wtf/writing/github-changes-since-last-review
+
+        # Use the GitHub API to get the references we need
+        local PR_NUMBER=$1
+        local MY_USER_ID
+        local PR_HEAD_SHA
+        local PR_LAST_REVIEW_SHA
+
+        MY_USER_ID=$(gh api "/user" -q '.id')
+        PR_HEAD_SHA=$(gh api "/repos/{owner}/{repo}/pulls/$PR_NUMBER" -q '.head.sha')
+        PR_LAST_REVIEW_SHA=$(gh api "/repos/{owner}/{repo}/pulls/$PR_NUMBER/reviews" \
+                            -q "map(select(.user.id == $MY_USER_ID) | .commit_id)[-1]")
+
+        # Fetch the commits we want to compare, unless we already have
+        if \
+            test "$(git cat-file -t "$PR_LAST_REVIEW_SHA" || echo 'none')" != commit \
+            -o "$(git cat-file -t "$PR_HEAD_SHA" || echo 'none')" != commit
+        then
+            git fetch origin "$PR_LAST_REVIEW_SHA" "$PR_HEAD_SHA"
+        fi
+
+        # Compare the ranges
+        git range-diff main "$PR_LAST_REVIEW_SHA" "$PR_HEAD_SHA"
+    }
+fi
 
 # initialize z as zoxide (if present on this machine)
 if [[ $- = *i* ]] && type zoxide >/dev/null 2>/dev/null; then
