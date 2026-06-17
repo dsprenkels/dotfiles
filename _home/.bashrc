@@ -75,6 +75,20 @@ function git-sb() {
     fi
 }
 
+# `git branch` with issue numbers turned into clickable GitHub links (OSC 8)
+function git-bl() {
+    local url slug remote
+    for remote in upstream origin; do
+        url=$(git remote get-url "$remote" 2>/dev/null) && break
+    done
+    slug=$(sed -E 's#^.*github\.com[:/]##; s#\.git$##' <<<"$url")
+    [ -z "$slug" ] && slug="pola-rs/polars"
+    git -c color.branch=always branch "$@" | perl -pe '
+        BEGIN { $s = shift @ARGV }
+        s{(?<![0-9A-Za-z])(\d{4,6})(?![0-9A-Za-z])}{\e]8;;https://github.com/$s/issues/$1\a$1\e]8;;\a}g
+    ' "$slug"
+}
+
 # preferred editor is vim, and preferred pager is less
 if [[ $- = *i* && $(hostnamectl hostname) == aang ]]; then
     export EDITOR="vim"
