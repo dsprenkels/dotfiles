@@ -7,11 +7,11 @@
         commitempty = commit --allow-empty-message --message=''
         lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
         sb = !bash --login -c \"git-sb\"
-        bl = !bash --login -c 'git-bl \"$@\"' _
         branchgc = !bash --login -c \"git-branchgc\"
         sns = show --name-status
         sno = show --name-only
         snap = commit --allow-empty-message ''
+	bl = !bash --login -c 'git-bl \"$@\"' _
 [core]
         editor = vim
         pager = bat --plain
