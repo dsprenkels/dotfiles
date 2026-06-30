@@ -1,100 +1,22 @@
 #!/usr/bin/env bash
-#
-# pr-review-rangediff.sh — show a git range-diff between the PR commit you last
-# reviewed on GitHub and the PR's current head, opened in VSCode.
-#
-# Usage:   ./pr-review-rangediff.sh <PR_NUMBER>
-# Example: ./pr-review-rangediff.sh 1234
-#
-# Requirements: gh (authenticated), git, code (VSCode CLI), jq.
-# Run from inside a clone of the repo the PR targets.
-#
-# This script was 100% generated with Claude. Discretionary is recommended.
-
 set -euo pipefail
 
-# ---- args -------------------------------------------------------------------
-if [[ $# -ne 1 ]]; then
-  echo "usage: $0 <PR_NUMBER>" >&2
-  exit 2
-fi
-PR="$1"
+# Based on https://daisy.wtf/writing/github-changes-since-last-review
 
-for bin in gh git jq; do
-  command -v "$bin" >/dev/null 2>&1 || { echo "error: '$bin' not found in PATH" >&2; exit 127; }
-done
+# Use the GitHub API to get the references we need
+PR_NUMBER=$1
+MY_USER_ID=$(gh api "/user" -q '.id')
+PR_HEAD_SHA=$(gh api "/repos/{owner}/{repo}/pulls/$PR_NUMBER" -q '.head.sha')
+PR_LAST_REVIEW_SHA=$(gh api "/repos/{owner}/{repo}/pulls/$PR_NUMBER/reviews" \
+                     -q "map(select(.user.id == $MY_USER_ID) | .commit_id)[-1]")
 
-# ---- who am I (to find *my* last review) ------------------------------------
-ME="$(gh api user --jq '.login')"
-
-# ---- PR metadata ------------------------------------------------------------
-# headRefOid = current head of the PR branch.
-read -r HEAD_SHA BASE_REF HEAD_REF <<<"$(
-  gh pr view "$PR" --json headRefOid,baseRefName,headRefName \
-    --jq '"\(.headRefOid) \(.baseRefName) \(.headRefName)"'
-)"
-
-# ---- find the commit SHA as of my last review -------------------------------
-# The reviews API records commit_id = the PR head commit at the moment each
-# review was submitted. We take the most recent review authored by me.
-REVIEWED_SHA="$(
-  gh api --paginate "repos/{owner}/{repo}/pulls/${PR}/reviews" \
-    --jq "[.[] | select(.user.login == \"${ME}\") | .commit_id] | last // empty" \
-    2>/dev/null || true
-)"
-
-if [[ -z "${REVIEWED_SHA}" ]]; then
-  echo "error: found no review authored by '${ME}' on PR #${PR}." >&2
-  echo "       (Submit at least one review — even a comment — so GitHub records the SHA.)" >&2
-  exit 1
+# Fetch the commits we want to compare, unless we already have
+if \
+    test "$(git cat-file -t "$PR_LAST_REVIEW_SHA" || echo 'none')" != commit \
+    -o "$(git cat-file -t "$PR_HEAD_SHA" || echo 'none')" != commit
+then
+    git fetch origin "$PR_LAST_REVIEW_SHA" "$PR_HEAD_SHA"
 fi
 
-if [[ "${REVIEWED_SHA}" == "${HEAD_SHA}" ]]; then
-  echo "Nothing new: the PR head (${HEAD_SHA:0:9}) is the same commit you last reviewed."
-  exit 0
-fi
-
-# ---- make sure both commits + the base are present locally ------------------
-# Force-pushed/rebased commits are often not in your local clone yet.
-echo "Fetching commits…" >&2
-git fetch -q origin "${BASE_REF}" "${HEAD_REF}" || true
-# Fetch the specific objects by SHA in case the old head was orphaned by a force-push.
-for sha in "${REVIEWED_SHA}" "${HEAD_SHA}"; do
-  if ! git cat-file -e "${sha}^{commit}" 2>/dev/null; then
-    git fetch -q origin "${sha}" 2>/dev/null \
-      || echo "warning: could not fetch ${sha:0:9}; range-diff may be incomplete." >&2
-  fi
-done
-
-# Merge-base on the target branch gives each side a comparable starting point.
-OLD_BASE="$(git merge-base "origin/${BASE_REF}" "${REVIEWED_SHA}" 2>/dev/null || echo "origin/${BASE_REF}")"
-NEW_BASE="$(git merge-base "origin/${BASE_REF}" "${HEAD_SHA}"     2>/dev/null || echo "origin/${BASE_REF}")"
-
-# ---- compute the range-diff -------------------------------------------------
-OUT="$(mktemp -t "pr${PR}-rangediff.XXXXXX").diff"
-
-{
-  echo "# Range-diff for PR #${PR}  (branch: ${HEAD_REF} → ${BASE_REF})"
-  echo "# reviewed: ${REVIEWED_SHA}"
-  echo "# current:  ${HEAD_SHA}"
-  echo "#"
-  echo "# Left column  = commits as of your last review"
-  echo "# Right column = commits in the current PR head"
-  echo "#"
-  # --creation-factor=999 makes range-diff pair up commits even when a rebase
-  # substantially rewrote them, so you see an inline diff (the '!' entries)
-  # instead of every commit showing as fully dropped+re-added.
-  git range-diff --color=never --creation-factor=999 \
-    "${OLD_BASE}..${REVIEWED_SHA}" \
-    "${NEW_BASE}..${HEAD_SHA}"
-} >"${OUT}"
-
-echo "Range-diff written to: ${OUT}" >&2
-
-# ---- open in VSCode ---------------------------------------------------------
-if command -v code >/dev/null 2>&1; then
-  code "${OUT}"
-else
-  echo "note: 'code' CLI not found; range-diff is at ${OUT}" >&2
-  command -v less >/dev/null 2>&1 && less -R "${OUT}" || cat "${OUT}"
-fi
+# Compare the ranges
+git range-diff main "$PR_LAST_REVIEW_SHA" "$PR_HEAD_SHA"
